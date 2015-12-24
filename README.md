@@ -168,4 +168,3 @@ describe('1 - List articles', function test() {
 ```
 npm install --save bouchon
 ```
->>>>>>> Squash dev commits.
