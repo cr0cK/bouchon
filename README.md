@@ -168,3 +168,9 @@ describe('1 - List articles', function test() {
 ```
 npm install --save bouchon
 ```
+
+## Tests
+
+In progress.
+
+More tests are also available in [bouchon-toolbox](https://github.com/cr0cK/bouchon-toolbox) and [bouchon-samples](https://github.com/cr0cK/bouchon-samples) repositories.
