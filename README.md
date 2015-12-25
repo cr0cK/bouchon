@@ -81,6 +81,8 @@ For more information about reselect, read the documentation at https://github.co
 #### Use common selectors from the toolbox!
 
 ```js
+import { selectRow, extendRows } from 'bouchon-toolbox';
+
 export const selectors = {};
 
 // return all articles
@@ -137,6 +139,8 @@ const setPaginationHeaders = data => (req, res, next) => {
   next();
 };
 ```
+
+Check [middlewares](https://github.com/cr0cK/bouchon-toolbox) from the toolbox.
 
 ### Fixtures
 
