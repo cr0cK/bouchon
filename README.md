@@ -6,36 +6,141 @@ Efficient API mocking with cool libraries.
 
 Have you already been in such situation?
 
-- you have to develop a feature but you don't have the API,
+- you have to develop a feature but you don't have the API yet,
 - you have developed your feature but you can not fully test it with unexpected data or delayed responses,
-- you want to mak some integration tests but you definitely don't want to setup a complex stack for that...
+- you want to make some integration tests but you definitely don't want to setup a complex stack for that...
 
 If yes, this tool should be useful for you.
 
 ## How does it works?
 
-Bouchon is using two cool libraries written by Dan Abramov, widely used in the ReactJS world:
+bouchon is using two cool libraries written by Dan Abramov, widely used in the ReactJS world:
 
-- "Redux" to maintain the state of your API,
+- "redux" to maintain the state of your API,
 - "reselect" to select data from your the state.
 
 If you are new to Redux and its vocabulary, I suggest you to read the documentation: https://github.com/rackt/redux.
 
 ### Actions and reducers
 
-To handle a request, Bouchon is emitting an action handled by a reducer that updates the state. For example:
+When receiving a request, bouchon is emitting an action handled by a reducer that updates the state. For example:
 
-- If you are doing a GET, your reducer will just return the full state,
-- If you are doing a POST, your reducer will add a new item to an exiting collection.
+- If you are doing a GET, your reducer will just return the state,
+- If you are doing a POST, your reducer will add a new item to an exiting collection,
+- If you are doing a DELETE, your reducer will remove an item of an exiting collection,
+- etc.
+
+You can make your own actions and reducers, not necessarily based on the method of the request if you have a very special API to mock.
+
+```js
+import { createAction } from 'bouchon';
+
+const actions = {
+  get: createAction(),
+  post: createAction(),
+};
+
+const reducers = {
+  [actions.get]: state => state,
+  [actions.post]: (state, {body}) => {
+    return [
+      ...state,
+      body,
+    ];
+  }
+};
+```
+
+A set of reducers for doing a RESTful API are available in the [bouchon-toolbox](https://github.com/cr0cK/bouchon-toolbox) repository.
 
 ### Selectors
 
-Selectors allow to select a part of your state. You can implement the filter or the map of your need, compose them, etc.
+Selectors allow to select a part of your state. They are customisable, composable, exportable, etc.
+
+The idea is to split your data into several fixtures and write selectors that can be reusable.
+
+For example, if you want to return one article from an url such `/articles/1`, you can write a selector like this:
+
+```js
+import { createSelector } from 'bouchon';
+
+const selectors = {};
+
+// params are the merge of querystring, matched and body parameters
+selectors.all = (/* params */) => state => state.articles;
+
+selectors.byId = ({id}) => createSelector(
+  selectors.all(),
+  articles => articles.filter(article => Number(article.id) === Number(id)).pop(),
+);
+```
+
+bouchon is providing `createSelector` from the reselect library.
 For more information about reselect, read the documentation at https://github.com/rackt/reselect.
+
+#### Use common selectors from the toolbox!
+
+```js
+export const selectors = {};
+
+// return all articles
+selectors.all = () => state => state.articles;
+
+// use the extendRows function of the toolbox to add the author data to each article
+// Could be translated by:
+// "Join the 'author_id' key from the first selector with the 'id' key from the second selector,
+// and set the result(s) in the 'author' key of the first selector".
+selectors.allWithAuthor = () => extendRows(
+  selectors.all, 'author_id',
+  authorsSelectors.all, 'id',
+  'author'
+);
+
+// use the selectRow function of the toolbox to filter results
+selectors.byId = ({id}) => selectRow(selectors.allWithAuthor, 'id', id);
+```
+
+Check [the full sample](https://github.com/cr0cK/bouchon-samples/tree/master/samples/2-articles-with-author) and try it!
+
+### Middlewares
+
+You certainly know how Express middlewares work? bouchon supports middlewares in the same way.
+
+For example, if you want a complete solution for pagination, you can easily write a middleware like this:
+
+```js
+// data is the selected data from your selector
+const setPaginationHeaders = data => (req, res, next) => {
+  const page = req.query.page || 1;
+  const perPage = req.query.perPage || 10;
+  const pageCount = Math.ceil(data.length / perPage);
+  const totalCount = data.length;
+  const slicedData = data.slice(
+    (page - 1) * perPage,
+    page * perPage
+  );
+
+  const headers = {
+    'x-page': page,
+    'x-per-page': perPage,
+    'x-page-count': pageCount,
+    'x-total-count': totalCount,
+  };
+
+  // if data are set in the response object, bouchon will return that data instead of those selected by your selector
+  res.data = slicedData;
+
+  // set pagination headers
+  res.set(headers);
+
+  // do not forget to call next to continue the chain
+  next();
+};
+```
 
 ### Fixtures
 
-When starting, Bouchon is looking every `*.fixture.js` file and load it. Each fixture file describe how actions / reducers / selectors will respond to your defined routes.
+When starting, bouchon is looking every `*.fixture.js` file and load it. Each fixture file describe how actions / reducers / selectors will respond to your defined routes.
 
 #### `articles.fixture.js`
 
@@ -44,7 +149,7 @@ import { createAction, createSelector } from 'bouchon';
 
 /**
  * Define your (Redux) actions.
- * For less boilerplate, Bouchon is using redux-act.
+ * For less boilerplate, bouchon is using redux-act.
  */
 
 const actions = {
@@ -63,7 +168,7 @@ selectors.all = (/* params */) => state => state.articles;
 
 selectors.byId = ({id}) => createSelector(
   selectors.all(),
-  articles => articles.filter(article => Number(article.id) === Number(id)),
+  articles => articles.filter(article => Number(article.id) === Number(id)).pop(),
 );
 
 /**
@@ -83,6 +188,8 @@ export default {
     'GET /': {
       action: actions.get,
       selector: selectors.all,
+      // optional middlewares
+      middlewares: [setPaginationHeaders],
       status: 200,
     },
     'GET /:id': {
@@ -100,19 +207,17 @@ export default {
 Then just start bouchon like this:
 
 ```bash
-$ ./node_modules/.bin/bouchon -d ./path/to/my/fixtures
+$ ./node_modules/.bin/bouchon -d ./path/to/my/fixtures [-p port]
 ```
 
-## More samples?
+If you want more samples, have a look of more complex use cases in the [bouchon-samples repository](https://github.com/cr0cK/bouchon-samples).
 
-Sure. Have a look of more complex use cases in the [bouchon-samples repository](https://github.com/cr0cK/bouchon-samples).
+## Using bouchon for integration tests
 
-## Using Bouchon for integration tests
+bouchon is providing an API useful for integration tests.
+For example, to test an app in a browser, you can start bouchon at the beginning of the test, execute your test with a Selenium based tool and stop bouchon at the end.
 
-You can use Bouchon integration tests by using its API.
-For example, to test an app in a browser, you can start Bouchon at the beginning of the test, execute your test with a Selenium based tool and stop Bouchon at the end.
-
-Bonus: Bouchon is recording all actions done during the test so you can check at the end of the test that your process did exactly what you are expected. See `bouchon.logs.get()`.
+Bonus: bouchon is recording all actions done during the test so you can check that your process did exactly what you are expected at the end of your test.
 
 
 ```js
@@ -133,7 +238,7 @@ describe('1 - List articles', function test() {
     freeport((err, port) => {
       this.port = port;
       const pathFixtures = path.resolve(__dirname);
-      bouchon.server.start(pathFixtures, port)
+      bouchon.server.start({ path: pathFixtures, port })
         .then(() => done())
         .catch(done);
     });
@@ -163,14 +268,20 @@ describe('1 - List articles', function test() {
 });
 ```
 
+### Full API:
+
+- `bouchon.start.start({path, port})    // start the server, return a promise`
+- `bouchon.start.stop()                 // stop the server, return a promise`
+- `bouchon.logs.get()                   // return the logs saved since the server has been started`
+- `bouchon.logs.reset()                 // return the logs`
+
 ## Installation
 
 ```
 npm install --save bouchon
 ```
 
-## Tests
+## Useful packages
 
-In progress.
-
-More tests are also available in [bouchon-toolbox](https://github.com/cr0cK/bouchon-toolbox) and [bouchon-samples](https://github.com/cr0cK/bouchon-samples) repositories.
+- [bouchon-toolbox](https://github.com/cr0cK/bouchon-toolbox): a set of useful reducers, selectors and middlewares for common use cases
+- [bouchon-samples](https://github.com/cr0cK/bouchon-samples): some examples for inspiration
