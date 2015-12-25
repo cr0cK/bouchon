@@ -25,20 +25,22 @@
   "dependencies": {
     "body-parser": "^1.14.1",
     "bouchon-toolbox": "0.0.1",
+    "bunyan": "^1.5.1",
+    "bunyan-format": "^0.2.1",
     "colors": "^1.1.2",
     "commander": "^2.9.0",
     "debug": "^2.2.0",
     "etag": "^1.7.0",
     "express": "^4.13.3",
     "lodash": "^3.10.1",
+    "morgan": "^1.6.1",
     "node-schema-object": "^2.0.2",
     "q": "^1.4.1",
     "redux": "^3.0.4",
     "redux-act": "^0.2.0",
     "redux-logger": "^2.0.4",
     "redux-thunk": "^1.0.0",
-    "reselect": "^2.0.1",
-    "winston": "^2.1.1"
+    "reselect": "^2.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.3.17",

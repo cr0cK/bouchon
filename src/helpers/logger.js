@@ -1,5 +1,16 @@
-import winston from 'winston';
+/* eslint no-console: 0 */
 
-const logger = winston;
+import bunyan from 'bunyan';
+import bformat from 'bunyan-format';
 
-export { logger };
+const formatOut = bformat({ outputMode: 'short' });
+
+const logger = bunyan.createLogger({
+  name: 'server',
+  stream: formatOut,
+  level: 'debug',
+});
+
+const log = console.log;
+
+export { logger, log };

@@ -1,9 +1,19 @@
 import childProcess from 'child_process';
 import path from 'path';
 import Q from 'q';
+import colors from 'colors';
 
-import { logger } from '../helpers/logger';
+import { logger, log } from '../helpers/logger';
 import * as logs from './logs';
+
+
+/**
+ * Get the logger string of the child process, hack it and just log it to not
+ * have a duplicate logger.info prefix.
+ */
+const childLogger = str => {
+  log(str.trim().replace(/server/, colors.magenta('child')));
+};
 
 
 let child;
@@ -38,7 +48,7 @@ export const start = args => {
   // log child's stdout
   child.stdout.on('data', (data) => {
     const str = data.toString('utf-8');
-    logger.info('child', str);
+    childLogger(str);
 
     if (/App listening at port/.test(str)) {
       // reset activity logs when the server is starting
@@ -50,13 +60,6 @@ export const start = args => {
     deferred.notify(str);
   });
 
-  // log child's stderr
-  child.stderr.on('data', (data) => {
-    const str = data.toString('utf-8');
-    logger.info('child', str);
-    deferred.notify(str);
-  });
-
   // receive messages from the child, like activities logs
   child.on('message', message => {
     if ('activityLog' in message) {
@@ -64,11 +67,18 @@ export const start = args => {
     }
   });
 
+  // log child's stderr
+  child.stderr.on('data', (data) => {
+    const str = data.toString('utf-8');
+    childLogger(str);
+    deferred.notify(str);
+  });
+
   // bind the exit event in case of the child crashs
   child.on('exit', () => {
     child = undefined;
     const str = 'The server has been stopped.';
-    logger.info('child', str);
+    logger.info(str);
     deferred.resolve(str);
   });
 
@@ -79,8 +89,6 @@ export const start = args => {
  * Stop the server.
  */
 export const stop = () => {
-  logger.info('Stopping server...');
-
   const deferred = Q.defer();
 
   if (!child) {
@@ -93,7 +101,6 @@ export const stop = () => {
     child.on('exit', () => {
       child = undefined;
       const str = 'The server has been stopped.';
-      logger.info(str);
       deferred.resolve(str);
     });
   }

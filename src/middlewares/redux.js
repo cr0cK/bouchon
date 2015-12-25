@@ -1,10 +1,12 @@
+import colors from 'colors';
+
 /**
  * Add some information about the dispatched action and set it in the request
  * object to display it after the morgan logs.
  */
 export const outputLogger = () => next => action => {
   const { query, params, body, req } = action.payload;
-  const str = `Payload: ${JSON.stringify({query, params, body})}`;
+  const str = `Payload: ${colors.white(JSON.stringify({query, params, body}))}`;
 
   req.reduxDispatchedAction = str;
 
