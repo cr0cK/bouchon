@@ -209,7 +209,7 @@ export default {
 };
 ```
 
-Of course, you can write your fixture in ES5, even if it's much more verbose. [Have a look of the sample examples written in ES5](https://github.com/cr0cK/bouchon-samples/blob/master/samples/1-articles/articles/index-es5.js).
+Of course, you can write your fixture in ES5, even if it's much more verbose. [Have a look of the same example written in ES5](https://github.com/cr0cK/bouchon-samples/blob/master/samples/1-articles/articles/index-es5.js).
 
 Then just start bouchon like this:
 
