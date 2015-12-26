@@ -19,7 +19,7 @@ bouchon is using two cool libraries written by Dan Abramov, widely used in the R
 - "redux" to maintain the state of your API,
 - "reselect" to select data from your the state.
 
-If you are new to Redux and its vocabulary, I suggest you to read the documentation: https://github.com/rackt/redux.
+If you are new to Redux and its vocabulary, I suggest you to read [the documentation](https://github.com/rackt/redux).
 
 ### Actions and reducers
 
@@ -76,9 +76,9 @@ selectors.byId = ({id}) => createSelector(
 ```
 
 bouchon is providing `createSelector` from the reselect library.
-For more information about reselect, read the documentation at https://github.com/rackt/reselect.
+For more information about reselect, read [the documentation](https://github.com/rackt/reselect).
 
-#### Use common selectors from the toolbox!
+bouchon-toolbox is providing some common selectors like `selectRow` and `extendRows`:
 
 ```js
 import { selectRow, extendRows } from 'bouchon-toolbox';
@@ -90,8 +90,8 @@ selectors.all = () => state => state.articles;
 
 // use the extendRows function of the toolbox to add the author data to each article
 // Could be translated by:
-// "Join the 'author_id' key from the first selector with the 'id' key from the second selector,
-// and set the result(s) in the 'author' key of the first selector".
+// "Join the 'author_id' key of the first selector with the 'id' key of the second selector,
+// and set the result in the 'author' key of the first selector".
 selectors.allWithAuthor = () => extendRows(
   selectors.all, 'author_id',
   authorsSelectors.all, 'id',
@@ -177,6 +177,7 @@ selectors.byId = ({id}) => createSelector(
 
 /**
  * Finally, define your fake API!
+ * Important: you have to use a 'default export'.
  */
 
 export default {
@@ -207,6 +208,8 @@ export default {
   delay: [0, 2000],
 };
 ```
+
+If you prefer (or if you don't have the choice) to write your fixture in ES5, it's much more verbose but you can. Have a look to the sample example [here](https://github.com/cr0cK/bouchon-samples/blob/master/samples/1-articles/articles/index-es5.js).
 
 Then just start bouchon like this:
 
@@ -258,7 +261,9 @@ describe('1 - List articles', function test() {
       body: {},
     }]);
 
-    bouchon.server.stop().then(() => done());
+    bouchon.server.stop()
+      .then(() => done())
+      .catch(done);
   });
 
   it('should return articles', (done) => {
