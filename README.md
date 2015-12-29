@@ -1,6 +1,24 @@
+<div align="center">
+  <img src="https://raw.githubusercontent.com/cr0cK/bouchon/update-docs/bouchon-icon.png" />
+</div>
+
 # bouchon
 
 Efficient API mocking with cool libraries.
+
+## Summary
+
+- [Why?](#why)
+- [How does it works?](#how-does-it-works)
+  - [Actions and Reducers](#actions-and-reducers)
+  - [Selectors](#selectors)
+  - [Middlewares](#middlewares)
+  - [Fixtures](#fixtures)
+- [bouchon API](#bouchon-api)
+  - [List of methods](#list-of-methods)
+- [Installation](#installation)
+- [Other related packages](#other-related-packages)
+- [License](#license)
 
 ## Why?
 
@@ -219,7 +237,7 @@ $ ./node_modules/.bin/bouchon -d ./path/to/my/fixtures [-p port]
 
 If you want more samples, have a look of more complex use cases in the [bouchon-samples repository](https://github.com/cr0cK/bouchon-samples).
 
-## Using bouchon for integration tests
+## bouchon API
 
 bouchon is providing an API useful for integration tests.
 For example, to test an app in a browser, you can start bouchon at the beginning of the test, execute your test with a Selenium based tool and stop bouchon at the end.
@@ -277,12 +295,14 @@ describe('1 - List articles', function test() {
 });
 ```
 
-### Full API:
+### List of methods
 
-- `bouchon.start.start({path, port})    // start the server, return a promise`
-- `bouchon.start.stop()                 // stop the server, return a promise`
-- `bouchon.logs.get()                   // return the logs saved since the server has been started`
-- `bouchon.logs.reset()                 // return the logs`
+```
+- bouchon.start.start({path, port})    // start the server, return a promise
+- bouchon.start.stop()                 // stop the server, return a promise
+- bouchon.logs.get()                   // return the logs saved since the server has been started
+- bouchon.logs.reset()                 // return the logs
+```
 
 ## Installation
 
@@ -290,7 +310,11 @@ describe('1 - List articles', function test() {
 npm install --save bouchon
 ```
 
-## Useful packages
+## Other related packages
 
 - [bouchon-toolbox](https://github.com/cr0cK/bouchon-toolbox): a set of useful reducers, selectors and middlewares for common use cases
 - [bouchon-samples](https://github.com/cr0cK/bouchon-samples): some examples for inspiration
+
+## License
+
+MIT.
