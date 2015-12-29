@@ -12,7 +12,7 @@ import thunk from 'redux-thunk';
 import { createReducer } from 'redux-act';
 
 import { outputLogger, activitiesLogger } from '../middlewares/redux';
-import { logger } from '../helpers/logger';
+import { logger, displayReduxLogs } from '../helpers/logger';
 
 
 const router = express.Router();
@@ -169,7 +169,8 @@ const createReducers = fixturesContent => {
  * - Return a delay between min and max if delay is an array
  * - Else 0
  *
- * @return {Integer}
+ * @param  {Number | Array}
+ * @return {Number}
  */
 const getDelay = (delay) => {
   if (_.isNumber(delay)) {
@@ -182,6 +183,37 @@ const getDelay = (delay) => {
   }
 
   return 0;
+};
+
+/**
+ * Extract the delay and the action function from the action parameter
+ * set in the route definition.
+ *
+ * @param  {Function | Array}
+ * @return {Object}
+ */
+const extractActionParams = (action_) => {
+  if (_.isUndefined(action_)) {
+    return undefined;
+  }
+
+  let delay = 0;
+  let action;
+
+  if (_.isFunction(action_)) {
+    action = action_;
+  } else if (_.isObject(action_)) {
+    delay = getDelay(action_.delay);
+    action = action_.action;
+  }
+
+  if (!_.isFunction(action)) {
+    action = () => {
+      logger.error(`Action must be callable.`);
+    };
+  }
+
+  return { delay, action };
 };
 
 /**
@@ -216,17 +248,38 @@ export const apiRouter = fixturesDir => {
       logger.info(`Registering "${verb} ${url}"`);
 
       router[method.toLowerCase()](url, (req, res, next) => {
-        const { action, selector, middlewares, status, delay } = routeDef;
+        const {
+          action, backendAction,
+          selector, middlewares, status } = routeDef;
 
-        // dispatch the action
-        if (_.isFunction(action)) {
-          store.dispatch(action({
-            query: req.query,
-            params: req.params,
-            body: req.body,
-            req: req,
-            res: res,
-          }));
+        // dispatch actions
+        const actionParams = extractActionParams(action);
+        const backendActionParams = extractActionParams(backendAction);
+
+        store.dispatch(actionParams.action({
+          query: req.query,
+          params: req.params,
+          body: req.body,
+          req: req,
+          res: res,
+          backendAction: extractActionParams(backendAction),
+        }));
+
+        if (backendActionParams) {
+          setTimeout(() => {
+            store.dispatch(backendActionParams.action({
+              query: req.query,
+              params: req.params,
+              body: req.body,
+              req: req,
+              res: res,
+            }));
+
+            displayReduxLogs(req.reduxLogs);
+
+          // exec after 100 ms even if no delay defined in order to be called
+          // after the action
+          }, backendActionParams.delay || 100);
         }
 
         // when Bouchon is starting by a fork of the API process
@@ -273,7 +326,7 @@ export const apiRouter = fixturesDir => {
 
             next();
           }
-        }, getDelay(delay));
+        }, actionParams.delay);
       });
     }
   });

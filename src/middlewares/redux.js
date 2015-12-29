@@ -1,21 +1,31 @@
 import colors from 'colors';
 
 /**
- * Add some information about the dispatched action and set it in the request
- * object to display it after the morgan logs.
+ * Add some information about the dispatched action and set it in the request.
  */
 export const outputLogger = () => next => action => {
-  const { query, params, body, req } = action.payload;
-  const str = `Payload: ${colors.white(JSON.stringify({query, params, body}))}`;
+  const { query, params, body, req, backendAction } = action.payload;
+  const msgs = [
+    `Action: ${colors.white(action.type)}`,
+    `Payload: ${colors.white(JSON.stringify({query, params, body}))}`,
+  ];
 
-  req.reduxDispatchedAction = str;
+  if (backendAction) {
+    const seconds = Math.round(backendAction.delay) / 1000;
+    if (seconds > 0) {
+      msgs.push(`Backend action dispatched in ${colors.white(seconds)} seconds...`);
+    }
+  }
+
+  req.reduxLogs = msgs;
 
   return next(action);
 };
 
-
 /**
- * Log activity.
+ * Add some information in the request object about the dispatched action.
+ * Used when usin bouchon via the API.
+ * Activities logs are available via `bouchon.logs.get` function.
  */
 export const activitiesLogger = () => next => action => {
   const { query, params, body, req, res } = action.payload;

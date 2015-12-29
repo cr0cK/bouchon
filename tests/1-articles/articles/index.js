@@ -1,4 +1,16 @@
-import { createAction, createSelector } from 'main';
+import { createAction, createSelector, SchemaObject } from 'main';
+import { reducers } from 'bouchon-toolbox';
+
+const { retrieve, create } = reducers;
+
+
+const ArticleSchema = new SchemaObject({
+  id: Number,
+  title: String,
+  body: String,
+  date_created: String,
+  author_id: Number,
+});
 
 
 /**
@@ -6,7 +18,9 @@ import { createAction, createSelector } from 'main';
  */
 
 const actions = {
-  get: createAction(),
+  get: createAction('GET_ARTICLES'),
+  post: createAction('POST_ARTICLES'),
+  postBackend: createAction('POST_BACKEND_ARTICLES'),
 };
 
 
@@ -36,6 +50,15 @@ const setTotalCountHeader = data => (req, res, next) => {
   next();
 };
 
+const sendOperation = () => (req, res, next) => {
+  res.data = {
+    operationId: 123456,
+    status: 'RUNNING',
+  };
+
+  next();
+};
+
 
 /**
  * Specs
@@ -45,7 +68,9 @@ export default {
   name: 'articles',
   data: require('./data.json'),
   reducer: ({
-    [actions.get]: state => state,
+    [actions.get]: state => retrieve(state),
+    [actions.post]: state => retrieve(state),
+    [actions.postBackend]: (state, params) => create(state, params.body, ArticleSchema),
   }),
   endpoint: 'articles',
   routes: {
@@ -56,13 +81,16 @@ export default {
       status: 200,
     },
     'GET /:id': {
-      action: actions.get,
+      action: {action: actions.get, delay: [400, 500]},
       selector: selectors.byId,
       status: 200,
-      delay: [150, 500],
     },
-    'GET /some/error': {
-      middlewares: [() => (req, res) => res.status(500).send('Something broke!')],
+    'POST /': {
+      action: actions.post,
+      backendAction: {action: actions.postBackend, delay: 1050},
+      middlewares: [sendOperation],
+      selector: selectors.all,
+      status: 201,
     },
   },
 };

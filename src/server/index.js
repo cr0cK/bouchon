@@ -10,7 +10,7 @@ import morgan from 'morgan';
 import { apiRouter } from '../lib/router';
 import { errorMiddleware } from '../middlewares/express';
 import { colorizeMethod } from '../helpers/colorizeMethod';
-import { logger } from '../helpers/logger';
+import { logger, displayReduxLogs } from '../helpers/logger';
 
 
 commander
@@ -52,8 +52,8 @@ app.use('/', apiRouter(commander.path));
 // display some stuff for each request
 app.use((req, res, next) => {
   logger.info(`${colorizeMethod(req.method)} ${req.originalUrl}`);
-  if (req.reduxDispatchedAction) {
-    logger.info(` => ${req.reduxDispatchedAction}`);
+  if (req.reduxLogs) {
+    displayReduxLogs(req.reduxLogs);
   }
   next();
 });

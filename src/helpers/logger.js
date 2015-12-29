@@ -5,12 +5,20 @@ import bformat from 'bunyan-format';
 
 const formatOut = bformat({ outputMode: 'short' });
 
-const logger = bunyan.createLogger({
+
+export const log = console.log;
+
+export const logger = bunyan.createLogger({
   name: 'server',
   stream: formatOut,
   level: 'debug',
 });
 
-const log = console.log;
-
-export { logger, log };
+/**
+ * Display logs formatted in a Redux middleware.
+ */
+export const displayReduxLogs = (reduxLogs) => {
+  reduxLogs.forEach(log_ => {
+    logger.info(` => ${log_}`);
+  });
+};

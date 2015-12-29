@@ -42,10 +42,10 @@ const actions = {
 
 const reducers = {
   [actions.get]: state => state,
-  [actions.post]: (state, {body}) => {
+  [actions.post]: (state, {params}) => {
     return [
       ...state,
-      body,
+      params.body,
     ];
   }
 };
