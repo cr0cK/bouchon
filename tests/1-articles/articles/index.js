@@ -86,7 +86,6 @@ export default {
       status: 200,
     },
     'POST /': {
-      // action: actions.post,
       backendAction: {action: actions.postBackend, delay: 1050},
       middlewares: [sendOperation],
       selector: selectors.all,
