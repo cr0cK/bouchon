@@ -1,7 +1,8 @@
-import { createAction, createSelector, SchemaObject } from 'main';
-import { reducers } from 'bouchon-toolbox';
+import { createAction, SchemaObject } from 'main';
+import { reducers, selectors as selectors_ } from 'bouchon-toolbox';
 
 const { retrieve, create } = reducers;
+const { selectRow } = selectors_;
 
 
 const ArticleSchema = new SchemaObject({
@@ -32,10 +33,7 @@ const selectors = {};
 
 selectors.all = () => state => state.articles;
 
-selectors.byId = ({id}) => createSelector(
-  selectors.all(),
-  articles => articles.filter(article => Number(article.id) === Number(id)).pop(),
-);
+selectors.byId = ({id}) => selectRow(selectors.all, 'id', id);
 
 
 /**
