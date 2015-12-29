@@ -193,12 +193,12 @@ const getDelay = (delay) => {
  * @return {Object}
  */
 const extractActionParams = (action_) => {
-  if (_.isUndefined(action_)) {
-    return undefined;
-  }
-
   let delay = 0;
   let action;
+
+  if (_.isUndefined(action_)) {
+    return { delay, action };
+  }
 
   if (_.isFunction(action_)) {
     action = action_;
@@ -256,16 +256,18 @@ export const apiRouter = fixturesDir => {
         const actionParams = extractActionParams(action);
         const backendActionParams = extractActionParams(backendAction);
 
-        store.dispatch(actionParams.action({
-          query: req.query,
-          params: req.params,
-          body: req.body,
-          req: req,
-          res: res,
-          backendAction: extractActionParams(backendAction),
-        }));
+        if (_.isFunction(actionParams.action)) {
+          store.dispatch(actionParams.action({
+            query: req.query,
+            params: req.params,
+            body: req.body,
+            req: req,
+            res: res,
+            backendAction: extractActionParams(backendAction),
+          }));
+        }
 
-        if (backendActionParams) {
+        if (_.isFunction(backendActionParams.action)) {
           setTimeout(() => {
             store.dispatch(backendActionParams.action({
               query: req.query,

@@ -68,7 +68,7 @@ describe('1 - List articles', function test() {
     );
   });
 
-  it('should create an article', (done) => {
+  it('should create an article with a backend action', (done) => {
     request.post(
       `http://localhost:${this.port}/articles`,
       { form: {
@@ -102,5 +102,15 @@ describe('1 - List articles', function test() {
         }, 1500);
       }
     );
+  });
+
+  it('should not break if action or selector are unset', (done) => {
+    request.del(
+      `http://localhost:${this.port}/articles/1`,
+      (err, res, body) => {
+        expect(res.statusCode).to.equal(200);
+        expect(body).to.equal('Not implemented.');
+        done();
+      });
   });
 });

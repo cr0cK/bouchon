@@ -86,11 +86,14 @@ export default {
       status: 200,
     },
     'POST /': {
-      action: actions.post,
+      // action: actions.post,
       backendAction: {action: actions.postBackend, delay: 1050},
       middlewares: [sendOperation],
       selector: selectors.all,
       status: 201,
+    },
+    'DELETE /:id': {
+      middlewares: [() => ({res}) => res.send('Not implemented.')],
     },
   },
 };
