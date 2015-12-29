@@ -50,15 +50,6 @@ const setTotalCountHeader = data => (req, res, next) => {
   next();
 };
 
-const sendOperation = () => (req, res, next) => {
-  res.data = {
-    operationId: 123456,
-    status: 'RUNNING',
-  };
-
-  next();
-};
-
 
 /**
  * Specs
@@ -86,8 +77,12 @@ export default {
       status: 200,
     },
     'POST /': {
+      action: actions.post,
       backendAction: {action: actions.postBackend, delay: 1050},
-      middlewares: [sendOperation],
+      responseBody: {
+        operationId: 123456,
+        status: 'RUNNING',
+      },
       selector: selectors.all,
       status: 201,
     },

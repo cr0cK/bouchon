@@ -250,7 +250,10 @@ export const apiRouter = fixturesDir => {
       router[method.toLowerCase()](url, (req, res, next) => {
         const {
           action, backendAction,
-          selector, middlewares, status } = routeDef;
+          responseBody,
+          selector, middlewares,
+          status,
+        } = routeDef;
 
         // dispatch actions
         const actionParams = extractActionParams(action);
@@ -324,7 +327,7 @@ export const apiRouter = fixturesDir => {
 
             // middlewares can save data in res.data to override the selected
             // data
-            res.json(res.data || data);
+            res.json(responseBody || res.data || data);
 
             next();
           }
