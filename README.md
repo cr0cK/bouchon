@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/cr0cK/bouchon/blob/assets/assets/images/bouchon-icon.png" />
+  <img src="https://raw.githubusercontent.com/cr0cK/bouchon/assets/assets/images/bouchon-icon.png" />
 </div>
 
 # bouchon
@@ -277,7 +277,7 @@ export default {
 
 Results:
 
-![Backend actions logs](https://github.com/cr0cK/bouchon/blob/assets/assets/images/backend-action-logs.png)
+![Backend actions logs](https://raw.githubusercontent.com/cr0cK/bouchon/assets/assets/images/backend-action-logs.png)
 
 
 ## bouchon API
