@@ -75,13 +75,11 @@ export default {
       status: 200,
     },
     'POST /': {
-      action: actions.post,
-      backendAction: {action: actions.postBackend, delay: 1050},
       responseBody: {
         operationId: 123456,
         status: 'RUNNING',
       },
-      selector: selectors.all,
+      backendAction: {action: actions.postBackend, delay: 1050},
       status: 201,
     },
     'DELETE /:id': {

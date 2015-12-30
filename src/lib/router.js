@@ -9,13 +9,14 @@ import { createStore,
          combineReducers,
          applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-import { createReducer } from 'redux-act';
+import { createAction, createReducer } from 'redux-act';
 
 import { outputLogger, activitiesLogger } from '../middlewares/redux';
 import { logger, displayReduxLogs } from '../helpers/logger';
 
 
 const router = express.Router();
+const dummyAction = createAction('DUMMY_ACTION');
 
 
 /**
@@ -158,6 +159,13 @@ const compileRoutes = fixturesContent => {
  */
 const createReducers = fixturesContent => {
   return fixturesContent.reduce((acc, content) => {
+    content.reducer = {
+      ...content.reducer,
+      // handle a dummy action in case of no action is set
+      // (useful to trigger Redux middlewares even if no action is set for a route)
+      [dummyAction]: state => state,
+    };
+
     acc[content.name] = createReducer(content.reducer, content.data);
     return acc;
   }, {});
@@ -259,16 +267,18 @@ export const apiRouter = fixturesDir => {
         const actionParams = extractActionParams(action);
         const backendActionParams = extractActionParams(backendAction);
 
-        if (_.isFunction(actionParams.action)) {
-          store.dispatch(actionParams.action({
-            query: req.query,
-            params: req.params,
-            body: req.body,
-            req: req,
-            res: res,
-            backendAction: extractActionParams(backendAction),
-          }));
+        if (!_.isFunction(actionParams.action)) {
+          actionParams.action = dummyAction;
         }
+
+        store.dispatch(actionParams.action({
+          query: req.query,
+          params: req.params,
+          body: req.body,
+          req: req,
+          res: res,
+          backendAction: extractActionParams(backendAction),
+        }));
 
         if (_.isFunction(backendActionParams.action)) {
           setTimeout(() => {
