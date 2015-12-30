@@ -5,7 +5,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## master
 
-* **[API-BREAK]** Delay is no longer settable via the `delay` key.
+* Add a `responseBody` key. Useful to return arbitrary data instead of data of the state.
+* Add a `backendAction` key. Useful to dispatch an action in the future in order to simulate asynchronous processes.
+
+```js
+  'POST /': {
+    responseBody: { status: 'OK' },
+    backendAction: {action: actions.postBackend, delay: 2000},
+    status: 201,
+  },
+```
+
+* `delay` key is deprecated, use the object notation for `action` to set a delay.
 * `action` and `backendAction` can now be a function or an object that defines a function and a delay.
 
 ```js
@@ -16,17 +27,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   },
 ```
 
-* Implements backend actions to dispatch delayed actions in order to simulate a backend.
-
-```js
-  'POST /': {
-    action: actions.post,
-    backendAction: {action: actions.postBackend, delay: 1000},
-    middlewares: [sendOperation],
-    selector: selectors.all,
-    status: 201,
-  },
-```
+* `action` key is optionnal. If not set, bouchon will emit a 'DUMMY_ACTION' (needed to enable logs).
+* `selector` key is optionnal.
 
 ## 0.0.2 - 2015/12/26
 
