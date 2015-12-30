@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/cr0cK/bouchon/update-docs/bouchon-icon.png" />
+  <img src="https://github.com/cr0cK/bouchon/blob/assets/assets/images/bouchon-icon.png" />
 </div>
 
 # bouchon
@@ -14,6 +14,7 @@ Efficient API mocking with cool libraries.
   - [Selectors](#selectors)
   - [Middlewares](#middlewares)
   - [Fixtures](#fixtures)
+- [Backend actions](#backend-actions)
 - [bouchon API](#bouchon-api)
   - [List of methods](#list-of-methods)
 - [Installation](#installation)
@@ -168,9 +169,14 @@ When starting, bouchon is looking every `*.fixture.js` file and load it. Each fi
 
 ```js
 import { createAction, createSelector } from 'bouchon';
+import { reducers, selectors as selectors_ } from 'bouchon-toolbox';
+
+const { retrieve } = reducers;
+const { selectRow } = selectors_;
+
 
 /**
- * Define your (Redux) actions.
+ * Define your actions.
  * For less boilerplate, bouchon is using redux-act.
  */
 
@@ -188,10 +194,8 @@ export const selectors = {};
 
 selectors.all = (/* params */) => state => state.articles;
 
-selectors.byId = ({id}) => createSelector(
-  selectors.all(),
-  articles => articles.filter(article => Number(article.id) === Number(id)).pop(),
-);
+selectors.byId = ({id}) => selectRow(selectors.all, 'id', id);
+
 
 /**
  * Finally, define your fake API!
@@ -204,7 +208,7 @@ export default {
   data: require('./data.json'),
   // define your reducer according to the action
   reducer: ({
-    [actions.get]: state => state,
+    [actions.get]: state => retrieve(state),
   }),
   // define for each route the action to emit and the selector to use
   routes: {
@@ -216,14 +220,13 @@ export default {
       status: 200,
     },
     'GET /:id': {
-      action: actions.get,
+      // random delay between 0 and 2000 ms
+      action: {action: actions.get, delay: [0, 2000]},
       selector: selectors.byId,
       status: 200,
     },
   },
   endpoint: 'articles',
-  // random delay of the response between 0 and 2000 ms
-  delay: [0, 2000],
 };
 ```
 
@@ -236,6 +239,46 @@ $ ./node_modules/.bin/bouchon -d ./path/to/my/fixtures [-p port]
 ```
 
 If you want more samples, have a look of more complex use cases in the [bouchon-samples repository](https://github.com/cr0cK/bouchon-samples).
+
+## Backend actions
+
+In some use cases, processes can be asynchronous: an API call can just respond "OK", save your request in a queue and later, a process will process your demand.
+Bouchon provides a feature named 'backendAction' that allows to dispatch an action in the future in order to simulate a backend activity.
+
+```js
+const actions = {
+  postBackend: createAction('POST_BACKEND_ARTICLES'),
+};
+
+export default {
+  name: 'articles',
+  data: require('./data.json'),
+  reducer: ({
+    [actions.postBackend]: (state, params) => create(state, params.body, ArticleSchema),
+  }),
+  endpoint: 'articles',
+  routes: {
+    'POST /': {
+      // instead of an action, it's possible to return arbitrary data that does not come from the state
+      responseBody: {
+        operationId: 123456,
+        status: 'RUNNING',
+      },
+      // then, define a `backendAction` that will emit the `actions.postBackend` action in 2 seconds
+      backendAction: {action: actions.postBackend, delay: 2000},
+      // no need to define an action or a selector since we return arbitrary data
+      // action: N/A,
+      // selector: N/A,
+      status: 201,
+    },
+  },
+};
+```
+
+Results:
+
+![Backend actions logs](https://github.com/cr0cK/bouchon/blob/assets/assets/images/backend-action-logs.png)
+
 
 ## bouchon API
 
