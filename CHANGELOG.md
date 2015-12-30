@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## master
 
+## 0.1.0 - 2015/12/30
+
 * Add a `responseBody` key. Useful to return arbitrary data instead of data of the state.
 * Add a `backendAction` key. Useful to dispatch an action in the future in order to simulate asynchronous processes.
 
