@@ -261,6 +261,7 @@ export const apiRouter = fixturesDir => {
           responseBody,
           selector, middlewares,
           status,
+          delay,
         } = routeDef;
 
         // dispatch actions
@@ -322,6 +323,15 @@ export const apiRouter = fixturesDir => {
           return res.statusOriginal(statusCode);
         };
 
+        // get delay
+        if (delay) {
+          logger.warn(
+`The \`delay\` key is deprecated. Use this notation instead:
+action: {action: myaction, delay: 1000}`);
+        }
+
+        const actionDelay = delay || actionParams.delay;
+
         setTimeout(() => {
           // apply middlewares
           if (_.isArray(middlewares)) {
@@ -341,7 +351,7 @@ export const apiRouter = fixturesDir => {
 
             next();
           }
-        }, actionParams.delay);
+        }, actionDelay);
       });
     }
   });
