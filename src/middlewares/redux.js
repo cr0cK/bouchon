@@ -7,12 +7,8 @@ export const outputLogger = () => next => action => {
   const { query, params, body, req, backendAction } = action.payload;
   const msgs = [];
 
-  if (action.type === 'DUMMY_ACTION') {
-    msgs.push(`Action: ${colors.white('No action defined.')}`);
-  } else {
-    msgs.push(`Action: ${colors.white(action.type)}`);
-    msgs.push(`Payload: ${colors.white(JSON.stringify({query, params, body}))}`);
-  }
+  msgs.push(`Action: ${colors.white(action.type)}`);
+  msgs.push(`Payload: ${colors.white(JSON.stringify({query, params, body}))}`);
 
   if (backendAction) {
     const seconds = Math.round(backendAction.delay) / 1000;

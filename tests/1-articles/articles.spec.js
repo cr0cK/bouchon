@@ -1,3 +1,4 @@
+/* eslint func-names: 0 */
 /* eslint no-console: 0 */
 
 import path from 'path';
@@ -9,7 +10,7 @@ import request from 'request';
 
 const expect = chai.expect;
 
-describe('1 - List articles', function test() {
+describe('1-articles', function() {
   this.timeout(10000);
   this.port = undefined;
   this.dateCreated = String(new Date());

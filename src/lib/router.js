@@ -5,18 +5,18 @@ import fs from 'fs';
 import path from 'path';
 import express from 'express';
 import _ from 'lodash';
-import { createStore,
-         combineReducers,
-         applyMiddleware } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import { createAction, createReducer } from 'redux-act';
 
 import { outputLogger, activitiesLogger } from '../middlewares/redux';
 import { logger, displayReduxLogs } from '../helpers/logger';
+import { concatEndpoint } from './combineFixturesRoutes';
+import { combineFixturesReducers } from './combineFixturesReducers';
 
 
 const router = express.Router();
-const dummyAction = createAction('DUMMY_ACTION');
+const dummyAction = createAction('dummy_action');
 
 
 /**
@@ -132,42 +132,12 @@ Cause: ${String(err)}
  * @return {Objet}                  Routes (keys are 'VERB URL')
  */
 const compileRoutes = fixturesContent => {
-  return fixturesContent.reduce((acc, routeDef) => {
-    let routes = {};
-
-    if (_.isObject(routeDef.routes)) {
-      // return a new object with endpoint concatenated to the url
-      routes = Object.keys(routeDef.routes).reduce((acc2, routeKey) => {
-        const [verb, url] = routeKey.split(/\s+/);
-        const finalUrl = ('/' + [routeDef.endpoint, url].join('/'))
-          .replace(/\/{2,}/g, '/');
-        const newRouteKey = [verb, finalUrl].join(' ');
-        acc2[newRouteKey] = routeDef.routes[routeKey];
-        return acc2;
-      }, {});
-    }
+  return fixturesContent.reduce((acc, fixture) => {
+    const routes = _.isObject(fixture.routes) ?
+      concatEndpoint(fixture.routes, fixture.endpoint) :
+      {};
 
     return Object.assign(acc, routes);
-  }, {});
-};
-
-/**
- * Create reducers from fixtures.
- *
- * @param  {Array} fixturesContent  Fixtures objects
- * @return {Objet}                  Reducers
- */
-const createReducers = fixturesContent => {
-  return fixturesContent.reduce((acc, content) => {
-    content.reducer = {
-      ...content.reducer,
-      // handle a dummy action in case of no action is set
-      // (useful to trigger Redux middlewares even if no action is set for a route)
-      [dummyAction]: state => state,
-    };
-
-    acc[content.name] = createReducer(content.reducer, content.data);
-    return acc;
   }, {});
 };
 
@@ -235,10 +205,9 @@ export const apiRouter = fixturesDir => {
   const fixturesFiles = retrieveFixtures(fixturesDir);
   const fixturesContent = loadFixtures(fixturesFiles);
   const allRoutes = compileRoutes(fixturesContent);
-  const reducers = createReducers(fixturesContent);
+  const rootReducer = combineFixturesReducers(fixturesContent);
 
   // init store
-  const rootReducer = combineReducers(reducers);
   const store = applyMiddleware(
     thunk,
     outputLogger,
@@ -246,7 +215,7 @@ export const apiRouter = fixturesDir => {
   )(createStore)(rootReducer);
 
   // register routes in the router
-  _.forEach(allRoutes, (routeDef, routeKey) => {
+  _.forEach(allRoutes, (fixture, routeKey) => {
     const [verb, url] = routeKey.split(/\s+/);
     const method = checkVerbValidity(verb);
 
@@ -262,12 +231,13 @@ export const apiRouter = fixturesDir => {
           selector, middlewares,
           status,
           delay,
-        } = routeDef;
+        } = fixture;
 
         // dispatch actions
         const actionParams = extractActionParams(action);
         const backendActionParams = extractActionParams(backendAction);
 
+        // set the dummy function is action has not been set
         if (!_.isFunction(actionParams.action)) {
           actionParams.action = dummyAction;
         }

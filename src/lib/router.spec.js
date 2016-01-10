@@ -3,13 +3,13 @@
 import chai from 'chai';
 import rewire from 'rewire';
 
-const api = rewire('./router');
+const router = rewire('./router');
 
 const assert = chai.assert;
 
-describe('api', function() {
+describe('Router', function() {
   describe('getDelay()', function() {
-    const getDelay = api.__get__('getDelay');
+    const getDelay = router.__get__('getDelay');
 
     it('should return a valid delay according args', () => {
       [
