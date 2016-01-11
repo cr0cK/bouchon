@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## master
 
+## 0.2.0 - 2016/01/11
+
+* Reducers and routes are now combinable (new `combineFixturesReducers`, `combineFixturesRoutes`, `combineFixtures` functions).
+* Use `filterRows` and `extendRows` new implementation from bouchon-toolbox.
+
 ## 0.1.0 - 2015/12/30
 
 * Add a `responseBody` key. Useful to return arbitrary data instead of data of the state.
@@ -34,7 +39,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 0.0.2 - 2015/12/26
 
-* Improve logger output
+* Improve logger output.
 * Update README.
 
 ## 0.0.1 - 2015/12/16

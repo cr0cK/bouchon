@@ -15,6 +15,7 @@ Efficient API mocking with cool libraries.
   - [Middlewares](#middlewares)
   - [Fixtures](#fixtures)
 - [Backend actions](#backend-actions)
+- [Combine fixtures](#combine-fixtures)
 - [bouchon API](#bouchon-api)
   - [List of methods](#list-of-methods)
 - [Installation](#installation)
@@ -97,10 +98,10 @@ selectors.byId = ({id}) => createSelector(
 bouchon is providing `createSelector` from the reselect library.
 For more information about reselect, read [the documentation](https://github.com/rackt/reselect).
 
-bouchon-toolbox is providing some common selectors like `selectRow` and `extendRows`:
+bouchon-toolbox is providing some common selectors like `selectRows` and `extendRows`:
 
 ```js
-import { selectRow, extendRows } from 'bouchon-toolbox';
+import { selectRows, extendRows } from 'bouchon-toolbox';
 
 export const selectors = {};
 
@@ -117,11 +118,13 @@ selectors.allWithAuthor = () => extendRows(
   'author'
 );
 
-// use the selectRow function of the toolbox to filter results
-selectors.byId = ({id}) => selectRow(selectors.allWithAuthor, 'id', id);
+// use the selectRows function of the toolbox to filter results
+selectors.byId = ({id}) => selectRows(selectors.allWithAuthor(), 'id', id);
 ```
 
-Check [the full sample](https://github.com/cr0cK/bouchon-samples/tree/master/samples/2-articles-with-author) and try it!
+Check [the full sample](https://github.com/cr0cK/bouchon-samples/tree/master/samples/2-articles-with-author) for a complete overview.
+
+For more information about `selectRows` and `extendRows`, check the documentation of the [bouchon-toolbox](https://github.com/cr0cK/bouchon-toolbox).
 
 ### Middlewares
 
@@ -172,7 +175,7 @@ import { createAction, createSelector } from 'bouchon';
 import { reducers, selectors as selectors_ } from 'bouchon-toolbox';
 
 const { retrieve } = reducers;
-const { selectRow } = selectors_;
+const { selectRows } = selectors_;
 
 
 /**
@@ -194,7 +197,7 @@ export const selectors = {};
 
 selectors.all = (/* params */) => state => state.articles;
 
-selectors.byId = ({id}) => selectRow(selectors.all, 'id', id);
+selectors.byId = ({id}) => selectRows(selectors.all(), 'id', id);
 
 
 /**
@@ -280,9 +283,59 @@ Results:
 ![Backend actions logs](https://raw.githubusercontent.com/cr0cK/bouchon/assets/assets/images/backend-action-logs.png)
 
 
+## Combine fixtures
+
+If you are already familiar with Redux, you certainly know how `combineReducers` work.
+
+bouchon is providing similar helpers to combine reducers and routes:
+
+```js
+import { combineFixturesReducers, combineFixturesRoutes } from 'main';
+
+import books from './books';
+import authors from './authors';
+
+export default {
+  name: 'paris',
+  endpoint: 'paris',
+  reducer: combineFixturesReducers({
+    books,
+    authors,
+  }),
+  routes: combineFixturesRoutes({
+    books,
+    authors,
+  }),
+};
+```
+
+You can even use `combineFixtures` for a more compact code (laziness for the win).
+
+```js
+import { combineFixtures } from 'main';
+
+import books from './books';
+import authors from './authors';
+
+export default {
+  name: 'paris',
+  endpoint: 'paris',
+  ...combineFixtures({
+    books,
+    authors,
+  }),
+};
+```
+
+
+
+
+
+
 ## bouchon API
 
 bouchon is providing an API useful for integration tests.
+
 For example, to test an app in a browser, you can start bouchon at the beginning of the test, execute your test with a Selenium based tool and stop bouchon at the end.
 
 Bonus: bouchon is recording all actions done during the test so you can check that your process did exactly what you are expected at the end of your test.
