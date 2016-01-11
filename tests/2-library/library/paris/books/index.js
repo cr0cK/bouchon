@@ -24,10 +24,8 @@ export const selectors = {};
 selectors.books = () => state => state.library.paris.books;
 
 selectors.all = () => extendRows(
-  selectors.books,
-  'author_id',
-  authorSelectors.authors,
-  'id',
+  selectors.books(), 'author_id',
+  authorSelectors.authors(), 'id',
   'author',
 );
 
