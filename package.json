@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "body-parser": "^1.14.1",
-    "bouchon-toolbox": "0.0.1",
+    "bouchon-toolbox": "^0.1.0",
     "bunyan": "^1.5.1",
     "bunyan-format": "^0.2.1",
     "colors": "^1.1.2",

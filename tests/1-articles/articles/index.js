@@ -2,7 +2,7 @@ import { createAction, SchemaObject } from 'main';
 import { reducers, selectors as selectors_ } from 'bouchon-toolbox';
 
 const { retrieve, create } = reducers;
-const { selectRow } = selectors_;
+const { filterRows } = selectors_;
 
 
 const ArticleSchema = new SchemaObject({
@@ -33,7 +33,7 @@ const selectors = {};
 
 selectors.all = () => state => state.articles;
 
-selectors.byId = ({id}) => selectRow(selectors.all, 'id', id);
+selectors.byId = ({id}) => filterRows(selectors.all(), 'id', id);
 
 
 /**
