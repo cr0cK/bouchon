@@ -1,6 +1,6 @@
 {
   "name": "bouchon",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Efficient API mocking with cool libraries",
   "main": "dist/main.js",
   "scripts": {
