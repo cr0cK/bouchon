@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 * Reducers and routes are now combinable (new `combineFixturesReducers`, `combineFixturesRoutes`, `combineFixtures` functions).
 * Use `filterRows` and `extendRows` new implementation from bouchon-toolbox.
+* Expose `combineReducers` via bouchon (in case of you need it)
 
 ## 0.1.0 - 2015/12/30
 
