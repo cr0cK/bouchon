@@ -7,7 +7,7 @@ import express from 'express';
 import _ from 'lodash';
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-import { createAction, createReducer } from 'redux-act';
+import { createAction } from 'redux-act';
 
 import { outputLogger, activitiesLogger } from '../middlewares/redux';
 import { logger, displayReduxLogs } from '../helpers/logger';
@@ -252,10 +252,13 @@ export const apiRouter = fixturesDir => {
         }));
 
         if (_.isFunction(backendActionParams.action)) {
+          // https://github.com/strongloop/express/issues/2734
+          const saveParams = Object.assign({}, req.params);
+
           setTimeout(() => {
             store.dispatch(backendActionParams.action({
               query: req.query,
-              params: req.params,
+              params: saveParams,
               body: req.body,
               req: req,
               res: res,

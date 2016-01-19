@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## master
 
+## 0.2.1 - 2016/01/19
+
+* Fix: Params were not set in `backendAction`s.
+
 ## 0.2.0 - 2016/01/11
 
 * Reducers and routes are now combinable (new `combineFixturesReducers`, `combineFixturesRoutes`, `combineFixtures` functions).
