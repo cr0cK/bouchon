@@ -167,6 +167,9 @@ const getDelay = (delay) => {
  * Extract the delay and the action(s) function(s) from the action parameter
  * set in the route definition.
  *
+ * If url is not defined, it does not fallback on a dummy action
+ * (if action was not defined).
+ *
  * @param  {Function | Array}
  * @return {Object}
  */
@@ -185,17 +188,22 @@ const extractActionParams = (action_, url) => {
     delay = getDelay(action_.delay);
     actions = _.isArray(action_.action) ?
       action_.action : [ action_.action ];
-  } else if (_.isUndefined(action_)) {
-    actions = [ dummyAction ];
   }
 
-  if (_.isArray(actions)) {
-    actions.forEach((action, i) => {
-      if (!_.isFunction(action)) {
-        logger.error(`A action declared in the route "${url}" is not callable.`);
-        actions[i] = dummyAction;
-      }
-    });
+  // set a dummy action as fallback if url is set
+  if (url) {
+    if (_.isUndefined(action_)) {
+      actions = [ dummyAction ];
+    }
+
+    if (_.isArray(actions)) {
+      actions.forEach((action, i) => {
+        if (!_.isFunction(action)) {
+          logger.error(`A action declared in the route "${url}" is not callable.`);
+          actions[i] = dummyAction;
+        }
+      });
+    }
   }
 
   return { delay, actions };
@@ -256,7 +264,7 @@ export const apiRouter = fixturesDir => {
 
     router[method.toLowerCase()](url, (req, res, next) => {
       const actionParams = extractActionParams(action, url);
-      const backendActionParams = extractActionParams(backendAction, url);
+      const backendActionParams = extractActionParams(backendAction);
       const actionsArgs = {
         query: req.query,
         // https://github.com/strongloop/express/issues/2734
