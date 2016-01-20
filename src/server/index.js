@@ -6,6 +6,7 @@ import path from 'path';
 import bodyParser from 'body-parser';
 import commander from 'commander';
 import morgan from 'morgan';
+import _ from 'lodash';
 
 import { apiRouter } from '../lib/router';
 import { errorMiddleware } from '../middlewares/express';

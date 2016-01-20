@@ -1,7 +1,9 @@
 import { createAction, SchemaObject } from 'main';
 import { reducers, selectors as selectors_ } from 'bouchon-toolbox';
 
-const { retrieve, create } = reducers;
+import { actions as authorsActions } from '../authors';
+
+const { retrieve, create, update } = reducers;
 const { filterRow } = selectors_;
 
 
@@ -9,8 +11,8 @@ const ArticleSchema = new SchemaObject({
   id: Number,
   title: String,
   body: String,
-  date_created: String,
-  author_id: Number,
+  dateCreated: String,
+  authorId: Number,
 });
 
 
@@ -19,9 +21,9 @@ const ArticleSchema = new SchemaObject({
  */
 
 const actions = {
-  get: createAction('GET_ARTICLES'),
-  post: createAction('POST_ARTICLES'),
-  postBackend: createAction('POST_BACKEND_ARTICLES'),
+  get: createAction('Get articles'),
+  post: createAction('Post article'),
+  patch: createAction('Patch article'),
 };
 
 
@@ -32,7 +34,6 @@ const actions = {
 const selectors = {};
 
 selectors.all = () => state => state.articles;
-
 selectors.byId = ({id}) => filterRow(selectors.all(), 'id', id);
 
 
@@ -58,8 +59,10 @@ export default {
   data: require('./data.json'),
   reducer: ({
     [actions.get]: state => retrieve(state),
-    [actions.post]: state => retrieve(state),
-    [actions.postBackend]: (state, params) => create(state, params.body, ArticleSchema),
+    [actions.post]: (state, {body}) => create(state, body, ArticleSchema),
+    [actions.patch]: (state, {params, body}) => (
+      update(state, params, body, ArticleSchema)
+    ),
   }),
   endpoint: 'articles',
   routes: {
@@ -79,11 +82,12 @@ export default {
         operationId: 123456,
         status: 'RUNNING',
       },
-      backendAction: {action: actions.postBackend, delay: 1000},
+      backendAction: {action: actions.post, delay: 1000},
       status: 201,
     },
-    'DELETE /:id': {
-      middlewares: [() => ({res}) => res.send('Not implemented.')],
+    'PATCH /:id': {
+      backendAction: {action: [actions.patch, authorsActions.patch], delay: 1000},
+      status: 204,
     },
   },
 };

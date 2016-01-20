@@ -164,34 +164,41 @@ const getDelay = (delay) => {
 };
 
 /**
- * Extract the delay and the action function from the action parameter
+ * Extract the delay and the action(s) function(s) from the action parameter
  * set in the route definition.
  *
  * @param  {Function | Array}
  * @return {Object}
  */
-const extractActionParams = (action_) => {
+const extractActionParams = (action_, url) => {
   let delay = 0;
-  let action;
+  let actions;
 
-  if (_.isUndefined(action_)) {
-    return { delay, action };
-  }
-
+  // case: action: actions.get
   if (_.isFunction(action_)) {
-    action = action_;
+    actions = [ action_ ];
+  // case: action: [actions.get, otherActions.get]
+  } else if (_.isArray(action_)) {
+    actions = action_;
+  // case: action: {action: actions.get, delay: 500},
   } else if (_.isObject(action_)) {
     delay = getDelay(action_.delay);
-    action = action_.action;
+    actions = _.isArray(action_.action) ?
+      action_.action : [ action_.action ];
+  } else if (_.isUndefined(action_)) {
+    actions = [ dummyAction ];
   }
 
-  if (!_.isFunction(action)) {
-    action = () => {
-      logger.error(`Action must be callable.`);
-    };
+  if (_.isArray(actions)) {
+    actions.forEach((action, i) => {
+      if (!_.isFunction(action)) {
+        logger.error(`A action declared in the route "${url}" is not callable.`);
+        actions[i] = dummyAction;
+      }
+    });
   }
 
-  return { delay, action };
+  return { delay, actions };
 };
 
 /**
@@ -218,115 +225,110 @@ export const apiRouter = fixturesDir => {
   _.forEach(allRoutes, (fixture, routeKey) => {
     const [verb, url] = routeKey.split(/\s+/);
     const method = checkVerbValidity(verb);
+    const {
+      action, backendAction,
+      responseBody,
+      selector, middlewares,
+      status,
+      delay,
+    } = fixture;
 
     if (!method) {
       logger.warn(`Verb "${verb}" is invalid! Skipping...`);
-    } else {
-      logger.info(`Registering "${verb} ${url}"`);
+      return true;
+    }
 
-      router[method.toLowerCase()](url, (req, res, next) => {
-        const {
-          action, backendAction,
-          responseBody,
-          selector, middlewares,
-          status,
-          delay,
-        } = fixture;
+    logger.info(`Registering "${verb} ${url}"`);
 
-        // dispatch actions
-        const actionParams = extractActionParams(action);
-        const backendActionParams = extractActionParams(backendAction);
+    router[method.toLowerCase()](url, (req, res, next) => {
+      const actionParams = extractActionParams(action, url);
+      const backendActionParams = extractActionParams(backendAction, url);
+      const actionsArgs = {
+        query: req.query,
+        // https://github.com/strongloop/express/issues/2734
+        params: Object.assign({}, req.params),
+        body: req.body,
+        req,
+        res,
+        backendAction: backendActionParams,
+      };
 
-        // set the dummy function is action has not been set
-        if (!_.isFunction(actionParams.action)) {
-          actionParams.action = dummyAction;
-        }
+      // dispatch main actions
+      if (_.isArray(actionParams.actions)) {
+        actionParams.actions.map(action_ => store.dispatch(action_(actionsArgs)));
+      }
 
-        store.dispatch(actionParams.action({
-          query: req.query,
-          params: req.params,
-          body: req.body,
-          req: req,
-          res: res,
-          backendAction: extractActionParams(backendAction),
-        }));
+      const selectorArgs = {
+        ...req.query,
+        ...req.params,
+        ...req.body,
+      };
 
-        if (_.isFunction(backendActionParams.action)) {
-          // https://github.com/strongloop/express/issues/2734
-          const saveParams = Object.assign({}, req.params);
+      // get data from the selector
+      let data;
+      if (_.isFunction(selector)) {
+        data = selector(selectorArgs)(store.getState());
+      }
 
-          setTimeout(() => {
-            store.dispatch(backendActionParams.action({
-              query: req.query,
-              params: saveParams,
-              body: req.body,
-              req: req,
-              res: res,
-            }));
+      // overwrite the status method to set a flag when setting the status (1)
+      res.statusOriginal = res.status;
+      res.status = statusCode => {
+        res.statusDefined = true;
+        return res.statusOriginal(statusCode);
+      };
 
-            displayReduxLogs(req.reduxLogs);
-
-          // exec after 100 ms even if no delay defined in order to be called
-          // after the action
-          }, backendActionParams.delay || 100);
-        }
-
-        // when Bouchon is starting by a fork of the API process
-        // (see api/server), the activities logs are sent to the child parent
-        if ('send' in process) {
-          process.send({activityLog: req.activityLog});
-        }
-
-        const selectorArgs = {
-          ...req.query,
-          ...req.params,
-          ...req.body,
-        };
-
-        // get data from the selector
-        let data;
-        if (_.isFunction(selector)) {
-          data = selector(selectorArgs)(store.getState());
-        }
-
-        // overwrite the status method to set a flag when setting the status (1)
-        res.statusOriginal = res.status;
-        res.status = statusCode => {
-          res.statusDefined = true;
-          return res.statusOriginal(statusCode);
-        };
-
-        // get delay
-        if (delay) {
-          logger.warn(
+      // get delay
+      if (delay) {
+        logger.warn(
 `The \`delay\` key is deprecated. Use this notation instead:
 action: {action: myaction, delay: 1000}`);
+      }
+
+      const actionDelay = delay || actionParams.delay;
+
+      // return response
+      setTimeout(() => {
+        // apply middlewares
+        if (_.isArray(middlewares)) {
+          middlewareTrampoline(data, middlewares)(req, res, next);
         }
 
-        const actionDelay = delay || actionParams.delay;
+        // set status code and send data if not already done
+        if (!res.headersSent) {
+          // (1)
+          if (status && !res.statusDefined) {
+            res.statusOriginal(status);
+          }
 
+          // middlewares can save data in res.data to override the selected
+          // data
+          res.json(responseBody || res.data || data);
+
+          next();
+        }
+      }, actionDelay);
+
+      // dispatch backend actions
+      if (_.isArray(backendActionParams.actions)) {
         setTimeout(() => {
-          // apply middlewares
-          if (_.isArray(middlewares)) {
-            middlewareTrampoline(data, middlewares)(req, res, next);
-          }
+          backendActionParams.actions.map(action_ => (
+            store.dispatch(action_(actionsArgs)))
+          );
 
-          // set status code and send data if not already done
-          if (!res.headersSent) {
-            // (1)
-            if (status && !res.statusDefined) {
-              res.statusOriginal(status);
-            }
+          // display redux log by filtering delay messages
+          displayReduxLogs(req.reduxLogs, log => log.type !== 'delay');
 
-            // middlewares can save data in res.data to override the selected
-            // data
-            res.json(responseBody || res.data || data);
+        // exec after 100 ms even if no delay defined in order to be called
+        // after the action
+        }, backendActionParams.delay || 100);
+      }
 
-            next();
-          }
-        }, actionDelay);
-      });
-    }
+      // when Bouchon is starting by a fork of the API process
+      // (see api/server), the activities logs are sent to the child parent
+      if ('send' in process) {
+        process.send({activityLog: req.activityLog});
+      }
+    });
   });
 
   return router;

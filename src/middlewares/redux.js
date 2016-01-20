@@ -7,17 +7,33 @@ export const outputLogger = () => next => action => {
   const { query, params, body, req, backendAction } = action.payload;
   const msgs = [];
 
-  msgs.push(`Action: ${colors.white(action.type)}`);
-  msgs.push(`Payload: ${colors.white(JSON.stringify({query, params, body}))}`);
+  msgs.push({
+    type: 'main',
+    msg: `Action: ${colors.white(action.type)}`,
+  });
+  msgs.push({
+    type: 'main',
+    msg: `Payload: ${colors.white(JSON.stringify({query, params, body}))}`,
+  });
 
   if (backendAction) {
     const seconds = Math.round(backendAction.delay) / 1000;
     if (seconds > 0) {
-      msgs.push(`Backend action dispatched in ${colors.white(seconds)} seconds...`);
+      msgs.push({
+        type: 'delay',
+        msg: `Backend action dispatched in ${colors.white(seconds)} seconds...`,
+      });
     }
   }
 
-  req.reduxLogs = msgs;
+  if (!('reduxLogs' in req)) {
+    req.reduxLogs = [];
+  }
+
+  req.reduxLogs = [
+    ...req.reduxLogs,
+    msgs,
+  ];
 
   return next(action);
 };
