@@ -10,7 +10,7 @@ import request from 'request';
 
 const expect = chai.expect;
 
-describe('3-async-articles', function() {
+describe('3-multiple-actions', function() {
   this.timeout(10000);
   this.port = undefined;
   this.dateCreated = String(new Date());

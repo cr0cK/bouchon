@@ -202,6 +202,20 @@ const extractActionParams = (action_, url) => {
 };
 
 /**
+ * Return or call responsBody.
+ *
+ * @param  {Function | Mixed} responseBody
+ * @param  {Object} selectorArgs
+ */
+const returnResponseBody = responseBody => selectorArgs => state => {
+  if (_.isFunction(responseBody)) {
+    return responseBody(selectorArgs)(state);
+  }
+
+  return responseBody;
+};
+
+/**
  * Initialize Redux store,
  * Define the router in charge of api routes.
  *
@@ -302,7 +316,11 @@ action: {action: myaction, delay: 1000}`);
 
           // middlewares can save data in res.data to override the selected
           // data
-          res.json(responseBody || res.data || data);
+          res.json(
+            returnResponseBody(responseBody)(selectorArgs)(store.getState()) ||
+            res.data ||
+            data
+          );
 
           next();
         }
