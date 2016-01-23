@@ -81,11 +81,11 @@ describe('3-async-articles', function() {
         // wait the backend action
         setTimeout(() => {
           Promise.all([
-            new Promise(resolve => {
+            new Promise((resolve, reject) => {
               request(
                 `http://localhost:${this.port}/articles/1`,
                 (err_, res_, body_) => {
-                  if (err_) { done(err_); }
+                  if (err_) { reject(err_); }
 
                   expect(res_.statusCode).to.equal(200);
                   expect(JSON.parse(body_)).to.deep.equal({
@@ -100,11 +100,11 @@ describe('3-async-articles', function() {
                 }
               );
             }),
-            new Promise(resolve => {
+            new Promise((resolve, reject) => {
               request(
                 `http://localhost:${this.port}/authors/1`,
                 (err_, res_, body_) => {
-                  if (err_) { done(err_); }
+                  if (err_) { reject(err_); }
 
                   expect(res_.statusCode).to.equal(200);
                   expect(JSON.parse(body_)).to.deep.equal({
