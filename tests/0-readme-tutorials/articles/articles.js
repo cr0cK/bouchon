@@ -22,7 +22,7 @@ const selectors = {};
 selectors.all = () => state => state.articles;
 selectors.byId = ({id}) => createSelector(
   selectors.all(),
-  articles => articles.filter(art => Number(art.id) === id).pop()
+  articles => articles.filter(art => Number(art.id) === Number(id)).pop()
 );
 
 const routes = {
