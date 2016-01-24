@@ -10,7 +10,7 @@ import thunk from 'redux-thunk';
 import { createAction } from 'redux-act';
 
 import { outputLogger, activitiesLogger } from '../middlewares/redux';
-import { logger, displayReduxLogs } from '../helpers/logger';
+import { logger, displayLogs } from '../lib/logger';
 import { concatEndpoint } from './combineFixturesRoutes';
 import { combineFixturesReducers } from './combineFixturesReducers';
 
@@ -337,12 +337,15 @@ action: {action: myaction, delay: 1000}`);
       // dispatch backend actions
       if (_.isArray(backendActionParams.actions)) {
         setTimeout(() => {
-          backendActionParams.actions.map(action_ => (
-            store.dispatch(action_(actionsArgs)))
-          );
+          backendActionParams.actions.map(action_ => {
+            // remove backendAction key to not add backend message in the
+            // middleware
+            delete actionsArgs.backendAction;
+            store.dispatch(action_(actionsArgs));
+          });
 
-          // display redux log by filtering delay messages
-          displayReduxLogs(req.reduxLogs, log => log.type !== 'delay');
+          // display dispatched action(s) logs
+          displayLogs(req.reduxLogs);
 
         // exec after 100 ms even if no delay defined in order to be called
         // after the action

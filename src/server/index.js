@@ -6,12 +6,11 @@ import path from 'path';
 import bodyParser from 'body-parser';
 import commander from 'commander';
 import morgan from 'morgan';
-import _ from 'lodash';
 
 import { apiRouter } from '../lib/router';
 import { errorMiddleware } from '../middlewares/express';
-import { colorizeMethod } from '../helpers/colorizeMethod';
-import { logger, displayReduxLogs } from '../helpers/logger';
+import { colorizeMethod } from '../lib/colorizeMethod';
+import { logger, displayLogs } from '../lib/logger';
 
 
 commander
@@ -53,9 +52,7 @@ app.use('/', apiRouter(commander.path));
 // display some stuff for each request
 app.use((req, res, next) => {
   logger.info(`${colorizeMethod(req.method)} ${req.originalUrl}`);
-  if (req.reduxLogs) {
-    displayReduxLogs(req.reduxLogs);
-  }
+  displayLogs(req.reduxLogs);
   next();
 });
 

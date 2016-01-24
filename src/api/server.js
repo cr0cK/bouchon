@@ -3,7 +3,7 @@ import path from 'path';
 import Q from 'q';
 import colors from 'colors';
 
-import { logger, log } from '../helpers/logger';
+import { logger, log } from '../lib/logger';
 import * as logs from './logs';
 
 
