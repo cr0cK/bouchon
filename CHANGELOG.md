@@ -25,6 +25,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   },
 ```
 
+- Rewrite README.
+
 ## [0.2.1] - 2016-01-19
 
 ### Fixed
