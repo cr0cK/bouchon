@@ -6,7 +6,7 @@
 
 Efficient API mocking with cool libraries.
 
-## Summary
+## Summary
 
 - [Big picture](#big-picture)
 
@@ -98,7 +98,7 @@ selectors.byId = ({id}) => createSelector(
 );
 ```
 
-### Reducers
+### Reducers
 
 Like every redux apps, you have to implement reducers that will maintain the state according to dispathed actions.
 
@@ -119,7 +119,7 @@ const reducer = {
   ]),
   [actions.delete]: (state, {params}) => {
     const copy = state.slice(0);    // be careful to never mutate the state
-    return copy.filter(art => Number(art.id) !== params.id);
+    return copy.filter(art => Number(art.id) !== Number(params.id));
   },
 };
 ```
@@ -181,7 +181,7 @@ const reducer = {
   ]),
   [actions.delete]: (state, {params}) => {
     const copy = state.slice(0);    // be careful to never mutate the state
-    return copy.filter(art => Number(art.id) !== params.id);
+    return copy.filter(art => Number(art.id) !== Number(params.id));
   },
 };
 
@@ -189,7 +189,7 @@ const selectors = {};
 selectors.all = () => state => state.articles;
 selectors.byId = ({id}) => createSelector(
   selectors.all(),
-  articles => articles.filter(art => Number(art.id) === id).pop()
+  articles => articles.filter(art => Number(art.id) === Number(id)).pop()
 );
 
 const routes = {
@@ -228,7 +228,7 @@ export default {
 Start bouchon by providing your fixture folder and an optionnal port:
 
 ```
-./node_modules/.bin/bouchon -d ./fixture -p 3000
+./node_modules/.bin/bouchon -d . -p 3000
 ```
 
 You should see bouchon registering your urls:
@@ -284,7 +284,7 @@ TODO
 
 TODO
 
-### Middlewares
+### Middlewares
 
 TODO
 
