@@ -175,6 +175,7 @@ const getDelay = (delay) => {
  */
 const extractActionParams = (action_, url) => {
   let delay = 0;
+  let meta = null;
   let actions;
 
   // case: action: actions.get
@@ -184,8 +185,10 @@ const extractActionParams = (action_, url) => {
   } else if (_.isArray(action_)) {
     actions = action_;
   // case: action: {action: actions.get, delay: 500},
+  // case: action: {action: [actions.get], delay: 500},
   } else if (_.isObject(action_)) {
     delay = getDelay(action_.delay);
+    meta = action_.meta;
     actions = _.isArray(action_.action) ?
       action_.action : [ action_.action ];
   }
@@ -206,7 +209,7 @@ const extractActionParams = (action_, url) => {
     }
   }
 
-  return { delay, actions };
+  return { actions, meta, delay };
 };
 
 /**
@@ -265,7 +268,7 @@ export const apiRouter = fixturesDir => {
     router[method.toLowerCase()](url, (req, res, next) => {
       const actionParams = extractActionParams(action, url);
       const backendActionParams = extractActionParams(backendAction);
-      const actionsArgs = {
+      const actionsArgs = [{
         query: req.query,
         // https://github.com/strongloop/express/issues/2734
         params: Object.assign({}, req.params),
@@ -273,11 +276,13 @@ export const apiRouter = fixturesDir => {
         req,
         res,
         backendAction: backendActionParams,
-      };
+      }, actionParams.meta];
 
       // dispatch main actions
       if (_.isArray(actionParams.actions)) {
-        actionParams.actions.map(action_ => store.dispatch(action_(actionsArgs)));
+        actionParams.actions.map(action_ => store.dispatch(
+          action_(...actionsArgs)
+        ));
       }
 
       const selectorArgs = {
@@ -340,8 +345,8 @@ action: {action: myaction, delay: 1000}`);
           backendActionParams.actions.map(action_ => {
             // remove backendAction key to not add backend message in the
             // middleware
-            delete actionsArgs.backendAction;
-            store.dispatch(action_(actionsArgs));
+            delete actionsArgs[0].backendAction;
+            store.dispatch(action_(...actionsArgs));
           });
 
           // display dispatched action(s) logs
