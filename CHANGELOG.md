@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.1] - 2016-02-01
+
+### Added
+- Add the support of meta data provided by [reduct-act](https://github.com/pauldijou/redux-act).
+
 ## [0.3.0] - 2016-01-23
 
 ### Changed
@@ -79,6 +84,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Initial commit.
 
 [Unreleased]: https://github.com/cr0cK/bouchon/compare/v0.3.0...HEAD
+[0.3.1]: https://github.com/cr0cK/bouchon/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/cr0cK/bouchon/compare/0.2.1...0.3.0
 [0.2.1]: https://github.com/cr0cK/bouchon/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/cr0cK/bouchon/compare/0.1.0...0.2.0
