@@ -1,14 +1,26 @@
 import { createAction, createSelector } from 'main';
 
+/**
+ * Actions
+ */
+
 export const actions = {
   get: createAction('Retrieve operations'),
-  create: createAction('Create an operation'),
+  create: createAction(
+    'Create an operation',
+    args => args,
+    (args, meta) => meta,
+  ),
   setToDone: createAction('Set an operation to done'),
 };
 
+/**
+ * Reducers
+ */
+
 const reducer = {
   [actions.get]: state => state,
-  [actions.create]: (state, {req, body}) => {
+  [actions.create]: (state, {req, body}, meta) => {
     const nextId = Math.max(...state.map(op => Number(op.id))) + 1;
     req.operationId = nextId;
 
@@ -16,7 +28,8 @@ const reducer = {
       ...state, {
         id: nextId,
         status: 'RUNNING',
-        ...body,
+        data: body,
+        ...meta,
       },
     ];
   },
@@ -37,17 +50,36 @@ const reducer = {
   },
 };
 
+/**
+ * Selectors
+ */
+
 export const selectors = {};
 selectors.all = () => state => state.operations;
+
+selectors.byId = ({id}) => createSelector(
+  selectors.all(),
+  opers => opers.filter(op => Number(op.id) === Number(id)).pop()
+);
+
 selectors.lastId = () => createSelector(
   selectors.all(),
   operations => operations[operations.length - 1]
 );
 
+/**
+ * Routes
+ */
+
 const routes = {
   'GET /': {
     action: actions.get,
     selector: selectors.all,
+    status: 200,
+  },
+  'GET /:id': {
+    action: actions.get,
+    selector: selectors.byId,
     status: 200,
   },
 };
