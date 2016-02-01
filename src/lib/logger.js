@@ -20,6 +20,10 @@ export const logger = bunyan.createLogger({
  * Flush logs and display them via logger.
  */
 export const displayLogs = logs => {
+  if (logs === undefined) {
+    return;
+  }
+
   if (_.isString(logs)) {
     logs = [ logs ];
   }
