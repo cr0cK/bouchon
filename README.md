@@ -439,7 +439,7 @@ with the payload data of my operation,
 - I can do a GET on `./articles` to list all created articles.
 
 See how you can export / import actions and selectors and how to define your route
-with `backendActions` in [this sample](https://github.com/cr0cK/bouchon/tree/master/tests/0-readme-tutorials).
+with `backendActions` in [this sample](https://github.com/cr0cK/bouchon/tree/master/tests/0-readme-tutorials/async-articles).
 
 
 ### Delays
@@ -523,7 +523,7 @@ It will combine the reducers and the routes.
 
 
 ```js
-import { combineFixturesReducers, combineFixturesRoutes } from 'main';
+import { combineFixtures } from 'bouchon';
 
 import books from './books';
 import authors from './authors';
@@ -544,7 +544,7 @@ If you want to write your fixtures with modern Javascript, you have to workaroun
 little bit in order to require Babel before your fixtures.
 
 The simplest way is a have only one fixture that requires all the others.
-Check it [there](https://github.com/cr0cK/bouchon/blob/master/tests/0-readme-tutorial/all.fixture.js).
+Check it [there](https://github.com/cr0cK/bouchon/blob/master/tests/0-readme-tutorials/articles/all.fixture.js).
 
 ## Bouchon full API
 
