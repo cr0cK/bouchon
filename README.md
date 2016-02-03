@@ -46,7 +46,7 @@ reselect allows to retrieve any data from that state.
 You define some data in a JSON file and your actions / reducers / selectors / middlewares / routes in a JS file.
 These two files is what I call a _fixture_.
 
-Each route (verb + url) defines an action, a selector and some optionnal middlewares.
+Each route (verb + url) defines an action, a selector and some optional middlewares.
 
 
 ## Before using bouchon
@@ -138,7 +138,7 @@ selectors.byId = ({id}) => createSelector(
 
 ### Reducers
 
-Like every redux apps, you have to implement reducers that will maintain the state according to dispathed actions.
+Like every redux apps, you have to implement reducers that will maintain the state according to dispatched actions.
 
 Here a basic implementation for the GET, POST, DELETE actions
 (reminder, bouchon is using [redux-act](https://github.com/pauldijou/redux-act)
@@ -267,7 +267,7 @@ export default {
 
 ### Start bouchon
 
-Start bouchon by providing your fixture folder and an optionnal port:
+Start bouchon by providing your fixture folder and an optional port:
 
 ```
 ./node_modules/.bin/bouchon -d . -p 3000
