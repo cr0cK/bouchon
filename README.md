@@ -69,17 +69,20 @@ Start an empty project, [install bouchon](#installation) and create folders and 
 ```
 $ mkdir bouchon-tutorial && cd $_
 $ npm init
-$ npm install bouchon --save-dev
-$ touch data.json && touch articles.fixture.js
+$ npm install bouchon babel-core babel-polyfill babel-preset-es2015 --save-dev
+$ mkdir article && cd $_ && touch data.json && touch index.js
 ```
+
+> Note: Examples are written in ES2015 and therefore, you have to install and configure Babel too.
+> See the [Babel section](#use-babel-for-your-fixtures) for more informations.
 
 ### JSON data
 
 Each fixture defines a JSON files with some data that will be saved in the state:
 
-```
-// data.json
+`// article/data.json`:
 
+```
 [
   {
     "id": 1,
@@ -102,7 +105,7 @@ that provides a simpler API to create actions and reducers. No types and switch 
 Start by creating some actions:
 
 ```js
-// articles.fixture.js
+// article/index.js
 
 import { createAction } from 'bouchon';
 
@@ -119,7 +122,7 @@ Continue by writing some selectors. Selectors uses [reselect](https://github.com
 used to select data from the state.
 
 ```js
-// articles.fixture.js
+// article/index.js
 
 import { createSelector } from 'bouchon';
 
@@ -145,7 +148,7 @@ Here a basic implementation for the GET, POST, DELETE actions
 and the syntax is different that one you may know):
 
 ```js
-// articles.fixture.js
+// article/index.js
 
 // [...]
 
@@ -171,7 +174,7 @@ and must return a new state (be careful to *NEVER* mutate the state).
 Now, we have to define the routes of our API.
 
 ```js
-// articles.fixture.js
+// article/index.js
 
 // [...]
 
@@ -205,7 +208,7 @@ Add a `name` that will be used as the key in the state where your `data` live an
 See the full fixture:
 
 ```js
-// article.fixture.js
+// article/index.js
 
 import { createAction, createSelector } from 'bouchon';
 
@@ -267,7 +270,29 @@ export default {
 
 ### Start bouchon
 
-Start bouchon by providing your fixture folder and an optional port:
+Bouchon is looking for files with `.fixture.js` suffix. Since your fixtures are
+written in ES2015, you have to workaround a little bit in order to be able to load
+them.
+
+The tweak is just to create a unique file that requires all your fixtures. Just place
+Babel at the top and you're done.
+
+```js
+// all.fixture.js
+
+require('babel-core/register');
+require('babel-polyfill');
+
+module.exports = {
+  default: [
+    require('./article').default,
+  ],
+};
+```
+
+> Note: Don't forget to create your `.babelrc` file. See the [Babel section](#use-babel-for-your-fixtures) for more informations.
+
+You can now start bouchon by providing your fixture folder and an optional port:
 
 ```
 ./node_modules/.bin/bouchon -d . -p 3000
@@ -543,8 +568,15 @@ export default {
 If you want to write your fixtures with modern Javascript, you have to workaround a
 little bit in order to require Babel before your fixtures.
 
-The simplest way is a have only one fixture that requires all the others.
-Check it [there](https://github.com/cr0cK/bouchon/blob/master/tests/0-readme-tutorials/articles/all.fixture.js).
+The simplest way is a have only [one fixture that requires all the others](https://github.com/cr0cK/bouchon/blob/master/tests/0-readme-tutorials/articles/all.fixture.js).
+
+> Note: Don't forget to create a `.babelrc` at the root of your fixtures with the ES2015 preset:
+
+```
+{
+  "presets": [ "es2015" ]
+}
+```
 
 ## Bouchon full API
 
