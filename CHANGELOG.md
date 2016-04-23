@@ -5,15 +5,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [0.3.1] - 2016-02-01
+## [0.3.2] - 2016-04-23
+### Changed
+  - Add babel tweak to README.
 
-### Added
-- Add the support of meta data provided by [reduct-act](https://github.com/pauldijou/redux-act).
+## [0.3.1] - 2016-02-01
 
-## [0.3.0] - 2016-01-23
+### Added
+  - Add the support of meta data provided by [reduct-act](https://github.com/pauldijou/redux-act).
 
-### Changed
-- Ability to define several actions and backendAction for a route
+## [0.3.0] - 2016-01-23
+### Changed
+  - Ability to define several actions and backendAction for a route
 
 ```js
   'POST /': {
@@ -22,7 +25,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   },
 ```
 
-- `responseBody` can be a function.
+  - `responseBody` can be a function.
 
 ```js
   'POST /': {
@@ -30,37 +33,34 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   },
 ```
 
-- Rewrite README.
+  - Rewrite README.
 
 ## [0.2.1] - 2016-01-19
-
 ### Fixed
-- Params were not set in `backendAction`s.
+  - Params were not set in `backendAction`s.
 
 ## [0.2.0] - 2016-01-11
-
 ### Added
-- Reducers and routes are now combinable (new `combineFixturesReducers`, `combineFixturesRoutes`, `combineFixtures` functions).
-- Use `filterRows` and `extendRows` new implementation from bouchon-toolbox.
-- Expose `combineReducers` via bouchon (in case of you need it)
+  - Reducers and routes are now combinable (new `combineFixturesReducers`, `combineFixturesRoutes`, `combineFixtures` functions).
+  - Use `filterRows` and `extendRows` new implementation from bouchon-toolbox.
+  - Expose `combineReducers` via bouchon (in case of you need it)
 
 ## [0.1.0] - 2015-12-30
-
 ### Added
-- `responseBody` key to quickly return arbitrary data instead of data of the state.
-- `backendAction` key to dispatch an action in the future in order to simulate asynchronous processes.
+  - `responseBody` key to quickly return arbitrary data instead of data of the state.
+  - `backendAction` key to dispatch an action in the future in order to simulate asynchronous processes.
 
 ```js
   'POST /': {
-    responseBody: { status: 'OK' },
+    responseBody: { status: 'OK' },
     backendAction: {action: actions.postBackend, delay: 2000},
     status: 201,
   },
 ```
 
 ### Changed
-- `delay` key is deprecated, use the object notation for `action` to set a delay.
-- `action` and `backendAction` can now be a function or an object that defines a function and a delay.
+  - `delay` key is deprecated, use the object notation for `action` to set a delay.
+  - `action` and `backendAction` can now be a function or an object that defines a function and a delay.
 
 ```js
   'GET /:id': {
@@ -70,20 +70,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   },
 ```
 
-- `action` key is optionnal. If not set, bouchon will emit a 'DUMMY_ACTION' (needed to enable logs).
-- `selector` key is optionnal.
+  - `action` key is optionnal. If not set, bouchon will emit a 'DUMMY_ACTION' (needed to enable logs).
+  - `selector` key is optionnal.
 
 ## [0.0.2] - 2015-12-26
-
-### Changed
-- Improve logger output.
-- Update README.
+### Changed
+  - Improve logger output.
+  - Update README.
 
 ## 0.0.1 - 2015-12-16
+  - Initial commit.
 
-- Initial commit.
 
-[Unreleased]: https://github.com/cr0cK/bouchon/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/cr0cK/bouchon/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/cr0cK/bouchon/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/cr0cK/bouchon/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/cr0cK/bouchon/compare/0.2.1...0.3.0
 [0.2.1]: https://github.com/cr0cK/bouchon/compare/0.2.0...0.2.1
