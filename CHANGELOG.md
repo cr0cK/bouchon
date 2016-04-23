@@ -9,6 +9,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
   - Add babel tweak to README.
 
+### Updated
+  - Update dependencies versions.
+
 ## [0.3.1] - 2016-02-01
 
 ### Added
