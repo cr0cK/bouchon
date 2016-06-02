@@ -276,6 +276,7 @@ export const apiRouter = fixturesDir => {
         req,
         res,
         backendAction: backendActionParams,
+        bouchonAction: true,
       }, actionParams.meta];
 
       // dispatch main actions
