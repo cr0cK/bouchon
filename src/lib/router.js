@@ -312,6 +312,10 @@ export const apiRouter = fixturesDir => {
 action: {action: myaction, delay: 1000}`);
       }
 
+      // save the store in the request object, still usefull to retrieve
+      // the state in some tricky use cases...
+      req.store = store;
+
       const actionDelay = delay || actionParams.delay;
 
       // return response
