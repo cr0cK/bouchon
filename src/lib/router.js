@@ -276,6 +276,7 @@ export const apiRouter = fixturesDir => {
         req,
         res,
         backendAction: backendActionParams,
+        bouchonAction: true,
       }, actionParams.meta];
 
       // dispatch main actions
@@ -310,6 +311,10 @@ export const apiRouter = fixturesDir => {
 `The \`delay\` key is deprecated. Use this notation instead:
 action: {action: myaction, delay: 1000}`);
       }
+
+      // save the store in the request object, still usefull to retrieve
+      // the state in some tricky use cases...
+      req.store = store;
 
       const actionDelay = delay || actionParams.delay;
 

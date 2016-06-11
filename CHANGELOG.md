@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.3] - 2016-06-12
+### Added
+  - Save a reference to the store in the request object.
+  - Add the possibility to dispatch custom actions (not handled by Bouchon).
+
 ## [0.3.2] - 2016-04-23
 ### Changed
   - Add babel tweak to README.
