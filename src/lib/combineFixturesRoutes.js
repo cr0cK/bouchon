@@ -8,16 +8,17 @@ import _ from 'lodash';
  * @param  {String} endpoint Endpoint
  * @return {Object}
  */
-export const concatEndpoint = (routes, endpoint) => {
-  return Object.keys(routes).reduce((acc2, routeKey) => {
+export const concatEndpoint = (routes, endpoint) => (
+  Object.keys(routes).reduce((acc, routeKey) => {
     const [verb, url] = routeKey.split(/\s+/);
-    const finalUrl = ('/' + [endpoint, url].join('/'))
-      .replace(/\/{2,}/g, '/');
+    const finalUrl = (`/${[endpoint, url].join('/')}`).replace(/\/{2,}/g, '/');
     const newRouteKey = [verb, finalUrl].join(' ');
-    acc2[newRouteKey] = routes[routeKey];
-    return acc2;
-  }, {});
-};
+    return {
+      ...acc,
+      [newRouteKey]: routes[routeKey],
+    };
+  }, {})
+);
 
 
 /**

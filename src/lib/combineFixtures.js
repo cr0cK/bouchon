@@ -8,9 +8,7 @@ import { combineFixturesRoutes } from './combineFixturesRoutes';
  * @param  {Object} fixtures Object describing the child fixtures
  * @return {Object}          Object to merge to an existing fixture
  */
-export const combineFixtures = (fixtures) => {
-  return {
-    reducer: combineFixturesReducers(fixtures),
-    routes: combineFixturesRoutes(fixtures),
-  };
-};
+export const combineFixtures = (fixtures) => ({
+  reducer: combineFixturesReducers(fixtures),
+  routes: combineFixturesRoutes(fixtures),
+});

@@ -1,5 +1,5 @@
 import { createAction } from 'main';
-import { reducers, selectors as selectors_ } from 'bouchon-toolbox';
+import { selectors as selectors_ } from 'bouchon-toolbox';
 
 const { filterRow } = selectors_;
 
@@ -20,7 +20,7 @@ const actions = {
 const selectors = {};
 
 selectors.all = () => state => state.articles;
-selectors.byId = ({id}) => filterRow(selectors.all(), 'id', id);
+selectors.byId = ({ id }) => filterRow(selectors.all(), 'id', id);
 
 
 /**
@@ -45,10 +45,10 @@ export default {
     'GET /:id': {
       action: actions.get,
       // some weird stuff just to check that it works...
-      responseBody: ({id}) => state => {
-        if (Number(id) === 42) return {error: 'Article not found'};
-        if (Number(id) === 1) return {error: 'Article protected'};
-        return selectors.byId({id})(state);
+      responseBody: ({ id }) => state => {
+        if (Number(id) === 42) return { error: 'Article not found' };
+        if (Number(id) === 1) return { error: 'Article protected' };
+        return selectors.byId({ id })(state);
       },
       status: 200,
     },

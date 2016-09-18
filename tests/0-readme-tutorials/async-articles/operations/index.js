@@ -20,9 +20,9 @@ export const actions = {
 
 const reducer = {
   [actions.get]: state => state,
-  [actions.create]: (state, {req, body}, meta) => {
+  [actions.create]: (state, { req, body }, meta) => {
     const nextId = Math.max(...state.map(op => Number(op.id))) + 1;
-    req.operationId = nextId;
+    req.operationId = nextId;   // eslint-disable-line no-param-reassign
 
     return [
       ...state, {
@@ -33,7 +33,7 @@ const reducer = {
       },
     ];
   },
-  [actions.setToDone]: (state, {req}) => {
+  [actions.setToDone]: (state, { req }) => {
     const { operationId } = req;
     const operation = state
       .filter(op => Number(op.id) === Number(operationId))
@@ -57,7 +57,7 @@ const reducer = {
 export const selectors = {};
 selectors.all = () => state => state.operations;
 
-selectors.byId = ({id}) => createSelector(
+selectors.byId = ({ id }) => createSelector(
   selectors.all(),
   opers => opers.filter(op => Number(op.id) === Number(id)).pop()
 );
@@ -88,6 +88,6 @@ export default {
   name: 'operations',
   data: require('./data.json'),
   endpoint: 'operations',
-  reducer: reducer,
-  routes: routes,
+  reducer,
+  routes,
 };

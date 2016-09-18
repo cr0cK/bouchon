@@ -10,8 +10,8 @@ import request from 'request';
 
 const expect = chai.expect;
 
-describe('0-readme-tutorials', function() {
-  describe('Import/export actions, backend actions, meta', function() {
+describe('0-readme-tutorials', function () {
+  describe('Import/export actions, backend actions, meta', function () {
     this.timeout(10000);
     this.port = undefined;
     this.dateCreated = String(new Date());
@@ -50,7 +50,7 @@ describe('0-readme-tutorials', function() {
         { form: {
           title: 'New title',
           body: 'New body',
-        }},
+        } },
         (err, res, body) => {
           if (err) { done(err); }
 

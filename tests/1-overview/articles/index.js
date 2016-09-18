@@ -33,7 +33,7 @@ const selectors = {};
 
 selectors.all = () => state => state.articles;
 
-selectors.byId = ({id}) => filterRow(selectors.all(), 'id', id);
+selectors.byId = ({ id }) => filterRow(selectors.all(), 'id', id);
 
 
 /**
@@ -70,7 +70,7 @@ export default {
       status: 200,
     },
     'GET /:id': {
-      action: {action: actions.get, delay: [400, 500]},
+      action: { action: actions.get, delay: [400, 500] },
       selector: selectors.byId,
       status: 200,
     },
@@ -79,11 +79,11 @@ export default {
         operationId: 123456,
         status: 'RUNNING',
       },
-      backendAction: {action: actions.postBackend, delay: 1000},
+      backendAction: { action: actions.postBackend, delay: 1000 },
       status: 201,
     },
     'DELETE /:id': {
-      middlewares: [() => ({res}) => res.send('Not implemented.')],
+      middlewares: [() => ({ res }) => res.send('Not implemented.')],
     },
   },
 };

@@ -8,10 +8,10 @@ const combineFixturesReducersModule = rewire('./combineFixturesReducers');
 
 const expect = chai.expect;
 
-describe('combineFixturesReducers', function() {
+describe('combineFixturesReducers', function () {
   const combineFixturesReducers = combineFixturesReducersModule.__get__('combineFixturesReducers');
   combineFixturesReducersModule.__set__('combineReducers', reducers => reducers);
-  combineFixturesReducersModule.__set__('createReducer', (actions, initialState) => ({actions, initialState}));
+  combineFixturesReducersModule.__set__('createReducer', (actions, initialState) => ({ actions, initialState }));
   combineFixturesReducersModule.__set__('dummyAction', 'DUMMY_ACTION');
   combineFixturesReducersModule.__set__('returnState', 'RETURN_CURRENT_STATE');
 
@@ -24,14 +24,14 @@ describe('combineFixturesReducers', function() {
     const reducer = {
       books: {
         name: 'books',
-        data: {foo: 'bar'},
+        data: { foo: 'bar' },
         reducer: {
           [actions.get]: 'function',
         },
       },
       authors: {
         name: 'authors',
-        data: {foo: 'baz'},
+        data: { foo: 'baz' },
         reducer: {
           [actions.get2]: 'function',
         },
@@ -42,16 +42,16 @@ describe('combineFixturesReducers', function() {
       books: {
         actions: {
           [actions.get]: 'function',
-          'DUMMY_ACTION': 'RETURN_CURRENT_STATE',
+          DUMMY_ACTION: 'RETURN_CURRENT_STATE',
         },
-        initialState: {foo: 'bar'},
+        initialState: { foo: 'bar' },
       },
       authors: {
         actions: {
           [actions.get2]: 'function',
-          'DUMMY_ACTION': 'RETURN_CURRENT_STATE',
+          DUMMY_ACTION: 'RETURN_CURRENT_STATE',
         },
-        initialState: {foo: 'baz'},
+        initialState: { foo: 'baz' },
       },
     });
   });

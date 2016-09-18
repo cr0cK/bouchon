@@ -27,7 +27,7 @@ export const start = args => {
   const defaultArgs = {
     port: 3000,
   };
-  const finalArgs = {...defaultArgs, ...args};
+  const finalArgs = { ...defaultArgs, ...args };
 
   const pathToFile = path.join(__dirname, '..', 'server', 'index.js');
   const commandArgs = [
@@ -53,7 +53,8 @@ export const start = args => {
       // reset activity logs when the server is starting
       logs.reset();
 
-      return deferred.resolve(str);
+      deferred.resolve(str);
+      return;
     }
 
     deferred.notify(str);

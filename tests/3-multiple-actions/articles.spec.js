@@ -10,7 +10,7 @@ import request from 'request';
 
 const expect = chai.expect;
 
-describe('3-multiple-actions', function() {
+describe('3-multiple-actions', function () {
   this.timeout(10000);
   this.port = undefined;
   this.dateCreated = String(new Date());
@@ -37,7 +37,7 @@ describe('3-multiple-actions', function() {
         body: 'My Body',
         date_created: this.dateCreated,
         author_id: 2,
-      }},
+      } },
       (err, res, body) => {
         if (err) { done(err); }
 
@@ -72,7 +72,7 @@ describe('3-multiple-actions', function() {
         title: 'Title 1 patched',
         lastName: 'Last name patched',
         authorId: 1,
-      }},
+      } },
       (err, res) => {
         if (err) { done(err); }
 

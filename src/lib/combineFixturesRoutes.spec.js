@@ -7,7 +7,7 @@ const combineFixturesRoutesModule = rewire('./combineFixturesRoutes');
 
 const expect = chai.expect;
 
-describe('combineFixturesRoutes', function() {
+describe('combineFixturesRoutes', function () {
   const combineFixturesRoutes = combineFixturesRoutesModule.__get__('combineFixturesRoutes');
 
   it('returns a combined object of routes', () => {

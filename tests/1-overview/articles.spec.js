@@ -1,5 +1,6 @@
 /* eslint func-names: 0 */
 /* eslint no-console: 0 */
+/* eslint max-len: 0 */
 
 import path from 'path';
 import chai from 'chai';
@@ -10,7 +11,7 @@ import request from 'request';
 
 const expect = chai.expect;
 
-describe('1-overview', function() {
+describe('1-overview', function () {
   this.timeout(10000);
   this.port = undefined;
   this.dateCreated = String(new Date());
@@ -57,11 +58,11 @@ describe('1-overview', function() {
         expect(res.statusCode).to.equal(200);
         expect(time).to.be.within(400, 550);
         expect(JSON.parse(body)).to.deep.equal({
-          'id': 1,
-          'title': 'cillum eu esse',
-          'body': 'Culpa in duis mollit ullamco minim quis ullamco eu. Veniam duis consequat ad veniam commodo. Labore laboris commodo aliquip ad labore non. Sit commodo nostrud id voluptate voluptate magna exercitation eu occaecat officia pariatur. Enim adipisicing quis fugiat et do esse non mollit. Officia exercitation irure culpa anim excepteur minim dolore duis.',
-          'date_created': 'Tuesday, October 20, 2015 2:34 PM',
-          'author_id': 1,
+          id: 1,
+          title: 'cillum eu esse',
+          body: 'Culpa in duis mollit ullamco minim quis ullamco eu. Veniam duis consequat ad veniam commodo. Labore laboris commodo aliquip ad labore non. Sit commodo nostrud id voluptate voluptate magna exercitation eu occaecat officia pariatur. Enim adipisicing quis fugiat et do esse non mollit. Officia exercitation irure culpa anim excepteur minim dolore duis.',
+          date_created: 'Tuesday, October 20, 2015 2:34 PM',
+          author_id: 1,
         });
 
         done();
@@ -77,7 +78,7 @@ describe('1-overview', function() {
         body: 'Body1',
         date_created: this.dateCreated,
         author_id: 2,
-      }},
+      } },
       (err, res, body) => {
         if (err) { done(err); }
 
