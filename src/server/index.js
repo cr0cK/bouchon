@@ -16,6 +16,7 @@ import { logger, displayLogs } from '../lib/logger';
 commander
   .option('-d, --path [path/to/fixtures]', 'Path to the fixtures')
   .option('-p, --port <port>', 'Port of the server')
+  .option('--hot', 'Enable hot-reload', false)
   .parse(process.argv);
 
 if (!commander.path) {
@@ -47,7 +48,7 @@ app.use(morgan('dev', {
 }));
 
 // use api router
-app.use('/', apiRouter(commander.path));
+app.use('/', apiRouter(commander));
 
 // display some stuff for each request
 app.use((req, res, next) => {
@@ -58,7 +59,11 @@ app.use((req, res, next) => {
 
 app.use(errorMiddleware);
 
+if (commander.hot) {
+  logger.info('✔ Hot-reload is enabled.');
+}
+
 const port = Number(commander.port) || 3000;
 app.listen(port, () => {
-  logger.info(`App listening at port ${port}.`);
+  logger.info(`✔ App listening at port ${port}.`);
 });

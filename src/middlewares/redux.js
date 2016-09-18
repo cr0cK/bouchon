@@ -1,5 +1,7 @@
 import colors from 'colors';
 
+import { saveState } from '../lib/hotReload';
+
 
 /**
  * Add some information about the dispatched action and set it in the request.
@@ -16,7 +18,7 @@ export const outputLogger = () => next => action => {
   const msgs = [];
 
   msgs.push(`Action: ${colors.white(action.type)}`);
-  msgs.push(`Payload: ${colors.white(JSON.stringify({query, params, body}))}`);
+  msgs.push(`Payload: ${colors.white(JSON.stringify({ query, params, body }))}`);
 
   if (!('reduxLogs' in req)) {
     req.reduxLogs = [];
@@ -63,5 +65,14 @@ export const activitiesLogger = () => next => action => {
 
   req.activityLog = log;
 
+  return next(action);
+};
+
+/**
+ * Write the state in a file, merged in the initialState when Bouchon is starting
+ * with the --hot option.
+ */
+export const hotReload = store => next => action => {
+  saveState(store.getState());
   return next(action);
 };
