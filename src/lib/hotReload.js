@@ -34,6 +34,11 @@ export const saveState = state => {
 export const readState = () => {
   const hotReloadFile = getFilePath();
   return new Promise((resolve) => {
+    if (!fs.existsSync(hotReloadFile)) {
+      resolve({});
+      return;
+    }
+
     fs.readFile(hotReloadFile, 'utf8', (err, data) => {
       if (err) {
         logger.warn(`Can't read the hot-reload file (${hotReloadFile}). Error: ${String(err)}`);
