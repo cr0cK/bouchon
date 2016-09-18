@@ -8,13 +8,18 @@ import _ from 'lodash';
 const formatOut = bformat({ outputMode: 'short' });
 
 
-export const log = console.log;
-
 export const logger = bunyan.createLogger({
   name: 'server',
   stream: formatOut,
   level: 'debug',
 });
+
+// use the logger for console output too
+console.log = logger.info.bind(logger);
+console.info = logger.info.bind(logger);
+console.debug = logger.debug.bind(logger);
+console.error = logger.error.bind(logger);
+console.warn = logger.warn.bind(logger);
 
 /**
  * Flush logs and display them via logger.
@@ -25,7 +30,7 @@ export const displayLogs = logs => {
   }
 
   if (_.isString(logs)) {
-    logs = [ logs ];
+    logs = [logs];
   }
 
   logs = logs.reverse();
