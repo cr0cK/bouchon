@@ -3,16 +3,15 @@ import path from 'path';
 import Q from 'q';
 import colors from 'colors';
 
-import { logger, log } from '../lib/logger';
+import { logger } from '../lib/logger';
 import * as logs from './logs';
 
 
 /**
- * Get the logger string of the child process, hack it and just log it to not
- * have a duplicate logger.info prefix.
+ * Log the child output.
  */
 const childLogger = str => {
-  log(str.trim().replace(/server/, colors.magenta('child')));
+  logger.info(str.trim().replace(/server/, colors.magenta('child')));
 };
 
 
