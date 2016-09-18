@@ -260,7 +260,7 @@ export const apiRouter = (options) => {
   let store;
   hotReloadPromise.then((initialState) => {
     if (!_.isEmpty(initialState)) {
-      logger.info('✔ Hot-reloading from the latest known state');
+      logger.info('✔ Hot-reloading from the latest known state.');
     }
 
     store = createStore(
@@ -270,7 +270,7 @@ export const apiRouter = (options) => {
     );
 
     logger.info('✔ Store is ready.');
-  });
+  }).catch((err) => logger.error(err));
 
   // register routes in the router
   _.forEach(allRoutes, (fixture, routeKey) => {
