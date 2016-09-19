@@ -29,7 +29,7 @@ export const actions = {
 export const selectors = {};
 
 selectors.all = () => state => state.authors;
-selectors.byId = ({id}) => filterRow(selectors.all(), 'id', id);
+selectors.byId = ({ id }) => filterRow(selectors.all(), 'id', id);
 
 
 /**
@@ -42,7 +42,7 @@ export default {
   data: require('./data.json'),
   reducer: {
     [actions.get]: state => state,
-    [actions.patch]: (state, {params, body}) => (
+    [actions.patch]: (state, { params, body }) => (
       update(state, params, body, AuthorSchema)
     ),
   },

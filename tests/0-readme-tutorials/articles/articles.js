@@ -12,7 +12,7 @@ const reducer = {
     ...state,
     params.body,
   ]),
-  [actions.delete]: (state, {params}) => {
+  [actions.delete]: (state, { params }) => {
     const copy = state.slice(0);    // be careful to never mutate the state
     return copy.filter(art => Number(art.id) !== Number(params.id));
   },
@@ -20,7 +20,7 @@ const reducer = {
 
 const selectors = {};
 selectors.all = () => state => state.articles;
-selectors.byId = ({id}) => createSelector(
+selectors.byId = ({ id }) => createSelector(
   selectors.all(),
   articles => articles.filter(art => Number(art.id) === Number(id)).pop()
 );
@@ -51,6 +51,6 @@ export default {
   name: 'articles',
   data: require('./data.json'),
   endpoint: 'articles',
-  reducer: reducer,
-  routes: routes,
+  reducer,
+  routes,
 };

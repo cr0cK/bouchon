@@ -43,11 +43,11 @@ const routes = {
     status: 200,
   },
   'POST /': {
-    action: {action: operationsActions.create, meta: {type: 'create_article'}},
+    action: { action: operationsActions.create, meta: { type: 'create_article' } },
     backendAction: {
       action: [actions.create, operationsActions.setToDone],
       delay: 1000,
-      meta: {type: 'foobar'},
+      meta: { type: 'foobar' },
     },
     selector: operationsSelectors.lastId,
     status: 201,
@@ -58,6 +58,6 @@ export default {
   name: 'articles',
   data: require('./data.json'),
   endpoint: 'articles',
-  reducer: reducer,
-  routes: routes,
+  reducer,
+  routes,
 };

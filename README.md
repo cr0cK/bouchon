@@ -28,6 +28,7 @@ Efficient API mocking with cool libraries.
   - [Middlewares](#middlewares)
   - [Combine fixtures](#combine-fixtures)
   - [Use Babel for your fixtures](#use-babel-for-your-fixtures)
+  - [Hot reload](#hot-reload)
 - [Bouchon full API](#bouchon-full-api)
 - [Use bouchon for integration testing](#use-bouchon-for-integration-testing)
 - [Installation](#installation)
@@ -577,6 +578,24 @@ The simplest way is a have only [one fixture that requires all the others](https
   "presets": [ "es2015" ]
 }
 ```
+
+### Hot reload
+
+Bouchon is providing a basic hot reload feature that allows to retrieve a previous state when the process is restarting.
+It's useful when you just want to test a different status code / output in a route without losing all the context of your mocks.
+
+To activate the feature, add the `--hot` option to your command line. When a query is performed, a `.bouchonHotReload` file
+will be written with the full state. Bouchon will read this file when being restarted by a process supervisor like nodemon,
+allowing to retrieve all the context of your mocks.
+
+When the process is exited with `ctrl+c`, the file is removed.
+
+Tips: To start Bouchon with nodemon, you can do something like this:
+
+```
+npm run start:dev -- -- -d /path/to/your/fixtures --hot
+```
+
 
 ## Bouchon full API
 

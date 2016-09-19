@@ -5,6 +5,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2016-09-19
+### Added
+  - Hot reload feature (see README for more informations).
+
+### Fixes
+  - Eslint warnings.
+  - Consistency in log calls.
+
 ## [0.3.3] - 2016-06-12
 ### Added
   - Save a reference to the store in the request object.
@@ -90,7 +98,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   - Initial commit.
 
 
-[Unreleased]: https://github.com/cr0cK/bouchon/compare/v0.3.2...HEAD
+[Unreleased]: https://github.com/cr0cK/bouchon/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/cr0cK/bouchon/compare/0.3.3...0.4.0
+[0.3.3]: https://github.com/cr0cK/bouchon/compare/0.3.2...0.3.3
 [0.3.2]: https://github.com/cr0cK/bouchon/compare/0.3.1...0.3.2
 [0.3.1]: https://github.com/cr0cK/bouchon/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/cr0cK/bouchon/compare/0.2.1...0.3.0

@@ -7,8 +7,8 @@ const router = rewire('./router');
 
 const assert = chai.assert;
 
-describe('Router', function() {
-  describe('getDelay()', function() {
+describe('Router', function () {
+  describe('getDelay()', function () {
     const getDelay = router.__get__('getDelay');
 
     it('should return a valid delay according args', () => {
@@ -20,7 +20,7 @@ describe('Router', function() {
         [[50, 250, 1000, 2000], value => value >= 50 && value <= 250],
         [undefined, value => value === 0],
       ].forEach(([value, test]) => {
-        assert(test(getDelay(value)), 'Fails with value ' + String(value));
+        assert(test(getDelay(value)), `Fails with value ${String(value)}`);
       });
     });
   });

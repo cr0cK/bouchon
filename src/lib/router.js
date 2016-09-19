@@ -1,5 +1,5 @@
 /* eslint new-cap: 0 */
-/* eslint no-param-reassign: 0 */
+/* eslint arrow-body-style: 0 */
 
 import fs from 'fs';
 import path from 'path';
@@ -9,10 +9,11 @@ import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import { createAction } from 'redux-act';
 
-import { outputLogger, activitiesLogger } from '../middlewares/redux';
-import { logger, displayLogs } from '../lib/logger';
+import { outputLogger, activitiesLogger, hotReload } from '../middlewares/redux';
+import { readState as readHotReloadState } from './hotReload';
 import { concatEndpoint } from './combineFixturesRoutes';
 import { combineFixturesReducers } from './combineFixturesReducers';
+import { displayLogs } from './logger';
 
 
 const router = express.Router();
@@ -41,7 +42,10 @@ const middlewareTrampoline = (data, chain) => {
   return function _trampoline(req, res, next) {
     function createNext(mdware, i) {
       return function _it(err) {
-        if (err) return next(err);
+        if (err) {
+          next(err);
+          return;
+        }
 
         const nextIndex = i + 1;
         const nextMiddleware = chain[nextIndex] ?
@@ -69,11 +73,12 @@ const retrieveFixtures = fixturesDir => {
   const fixturesFound = [];
 
   const parseDir = dir => {
-    fs.readdirSync(dir).map(file => {
+    fs.readdirSync(dir).forEach(file => {
       const fullDir = path.join(path.resolve(dir), file);
       const stats = fs.lstatSync(fullDir);
       if (stats.isDirectory()) {
-        return parseDir(fullDir);
+        parseDir(fullDir);
+        return;
       }
       if (stats.isFile() && /\.fixture\.js$/.test(file)) {
         fixturesFound.push(fullDir);
@@ -97,7 +102,7 @@ const retrieveFixtures = fixturesDir => {
 const loadFixtures = fixturesFiles => {
   return fixturesFiles.reduce((acc, fixturePath) => {
     try {
-      let fixtureContent = require(fixturePath).default;
+      let fixtureContent = require(fixturePath).default;  // eslint-disable-line global-require
 
       if (!_.isArray(fixtureContent)) {
         fixtureContent = [fixtureContent];
@@ -105,17 +110,17 @@ const loadFixtures = fixturesFiles => {
 
       fixtureContent.forEach(fixtureContent_ => {
         if (!fixtureContent_.name) {
-          logger.error(`
+          console.error(`
 Add a 'name' key in the specs of the fixture localised at ${fixturePath}.
 It will be used to save fixture data in the store.
           `);
-          return true;
+          return;
         }
 
         acc.push(fixtureContent_);
       });
     } catch (err) {
-      logger.error(`
+      console.error(`
 Can't require the fixture from the path "${fixturePath}"
 Cause: ${String(err)}
       `);
@@ -180,7 +185,7 @@ const extractActionParams = (action_, url) => {
 
   // case: action: actions.get
   if (_.isFunction(action_)) {
-    actions = [ action_ ];
+    actions = [action_];
   // case: action: [actions.get, otherActions.get]
   } else if (_.isArray(action_)) {
     actions = action_;
@@ -190,19 +195,19 @@ const extractActionParams = (action_, url) => {
     delay = getDelay(action_.delay);
     meta = action_.meta;
     actions = _.isArray(action_.action) ?
-      action_.action : [ action_.action ];
+      action_.action : [action_.action];
   }
 
   // set a dummy action as fallback if url is set
   if (url) {
     if (_.isUndefined(action_)) {
-      actions = [ dummyAction ];
+      actions = [dummyAction];
     }
 
     if (_.isArray(actions)) {
       actions.forEach((action, i) => {
         if (!_.isFunction(action)) {
-          logger.error(`A action declared in the route "${url}" is not callable.`);
+          console.error(`A action declared in the route "${url}" is not callable.`);
           actions[i] = dummyAction;
         }
       });
@@ -230,21 +235,42 @@ const returnResponseBody = responseBody => selectorArgs => state => {
  * Initialize Redux store,
  * Define the router in charge of api routes.
  *
- * @param  {String fixturesDir  Directory of the fixtures
- * @return {Object}             Router
+ * @param  {Object} options - path: Path of fixtures
+ *                          - hot: Enable hot reload
  */
-export const apiRouter = fixturesDir => {
-  const fixturesFiles = retrieveFixtures(fixturesDir);
+export const apiRouter = (options) => {
+  const fixturesFiles = retrieveFixtures(options.path);
   const fixturesContent = loadFixtures(fixturesFiles);
   const allRoutes = compileRoutes(fixturesContent);
   const rootReducer = combineFixturesReducers(fixturesContent);
 
   // init store
-  const store = applyMiddleware(
-    thunk,
-    outputLogger,
-    activitiesLogger,
-  )(createStore)(rootReducer);
+  console.info('Initializing store...');
+
+  const reduxMiddlewares = [thunk, outputLogger, activitiesLogger];
+  if (options.hot) {
+    reduxMiddlewares.push(hotReload);
+  }
+
+  let hotReloadPromise = Promise.resolve({});
+  if (options.hot) {
+    hotReloadPromise = readHotReloadState();
+  }
+
+  let store;
+  hotReloadPromise.then((initialState) => {
+    if (!_.isEmpty(initialState)) {
+      console.info('✔ Hot-reloading from the latest known state.');
+    }
+
+    store = createStore(
+      rootReducer,
+      initialState,
+      applyMiddleware(...reduxMiddlewares),
+    );
+
+    console.info('✔ Store is ready.');
+  }).catch((err) => console.error(err));
 
   // register routes in the router
   _.forEach(allRoutes, (fixture, routeKey) => {
@@ -259,13 +285,19 @@ export const apiRouter = fixturesDir => {
     } = fixture;
 
     if (!method) {
-      logger.warn(`Verb "${verb}" is invalid! Skipping...`);
-      return true;
+      console.warn(`Verb "${verb}" is invalid! Skipping...`);
+      return;
     }
 
-    logger.info(`Registering "${verb} ${url}"`);
+    console.info(`Registering "${verb} ${url}"`);
 
     router[method.toLowerCase()](url, (req, res, next) => {
+      if (!store) {
+        console.error('Store is not ready, wait a second and try again...');
+        next();
+        return;
+      }
+
       const actionParams = extractActionParams(action, url);
       const backendActionParams = extractActionParams(backendAction);
       const actionsArgs = [{
@@ -299,22 +331,22 @@ export const apiRouter = fixturesDir => {
       }
 
       // overwrite the status method to set a flag when setting the status (1)
-      res.statusOriginal = res.status;
-      res.status = statusCode => {
-        res.statusDefined = true;
+      res.statusOriginal = res.status;  // eslint-disable-line no-param-reassign
+      res.status = statusCode => {      // eslint-disable-line no-param-reassign
+        res.statusDefined = true;       // eslint-disable-line no-param-reassign
         return res.statusOriginal(statusCode);
       };
 
       // get delay
       if (delay) {
-        logger.warn(
+        console.warn(
 `The \`delay\` key is deprecated. Use this notation instead:
 action: {action: myaction, delay: 1000}`);
       }
 
       // save the store in the request object, still usefull to retrieve
       // the state in some tricky use cases...
-      req.store = store;
+      req.store = store;                // eslint-disable-line no-param-reassign
 
       const actionDelay = delay || actionParams.delay;
 
@@ -347,7 +379,7 @@ action: {action: myaction, delay: 1000}`);
       // dispatch backend actions
       if (_.isArray(backendActionParams.actions)) {
         setTimeout(() => {
-          backendActionParams.actions.map(action_ => {
+          backendActionParams.actions.forEach(action_ => {
             // remove backendAction key to not add backend message in the
             // middleware
             delete actionsArgs[0].backendAction;
@@ -365,7 +397,7 @@ action: {action: myaction, delay: 1000}`);
       // when Bouchon is starting by a fork of the API process
       // (see api/server), the activities logs are sent to the child parent
       if ('send' in process) {
-        process.send({activityLog: req.activityLog});
+        process.send({ activityLog: req.activityLog });
       }
     });
   });

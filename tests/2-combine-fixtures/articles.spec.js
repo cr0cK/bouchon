@@ -10,8 +10,8 @@ import request from 'request';
 
 const expect = chai.expect;
 
-describe('2-combine-fixtures', function() {
-  describe('should return books with authors', function() {
+describe('2-combine-fixtures', function () {
+  describe('should return books with authors', function () {
     this.timeout(10000);
     this.port = undefined;
 

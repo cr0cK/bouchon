@@ -8,3 +8,9 @@ plugins:
 
 env:
   mocha: true
+
+rules:
+  no-underscore-dangle: 0
+  global-require: 0
+  prefer-arrow-callback: 0
+  no-console: 0

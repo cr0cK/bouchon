@@ -34,7 +34,7 @@ const actions = {
 const selectors = {};
 
 selectors.all = () => state => state.articles;
-selectors.byId = ({id}) => filterRow(selectors.all(), 'id', id);
+selectors.byId = ({ id }) => filterRow(selectors.all(), 'id', id);
 
 
 /**
@@ -59,8 +59,8 @@ export default {
   data: require('./data.json'),
   reducer: ({
     [actions.get]: state => retrieve(state),
-    [actions.post]: (state, {body}) => create(state, body, ArticleSchema),
-    [actions.patch]: (state, {params, body}) => (
+    [actions.post]: (state, { body }) => create(state, body, ArticleSchema),
+    [actions.patch]: (state, { params, body }) => (
       update(state, params, body, ArticleSchema)
     ),
   }),
@@ -73,7 +73,7 @@ export default {
       status: 200,
     },
     'GET /:id': {
-      action: {action: actions.get, delay: [400, 500]},
+      action: { action: actions.get, delay: [400, 500] },
       selector: selectors.byId,
       status: 200,
     },
@@ -82,11 +82,11 @@ export default {
         operationId: 123456,
         status: 'RUNNING',
       },
-      backendAction: {action: actions.post, delay: 1000},
+      backendAction: { action: actions.post, delay: 1000 },
       status: 201,
     },
     'PATCH /:id': {
-      backendAction: {action: [actions.patch, authorsActions.patch], delay: 1000},
+      backendAction: { action: [actions.patch, authorsActions.patch], delay: 1000 },
       status: 204,
     },
   },

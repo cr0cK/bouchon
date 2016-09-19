@@ -17,12 +17,10 @@ const returnState = state => state;
  * Handle a dummy action in case of no action is set.
  * (useful to trigger Redux middlewares even if no action is set for a route)
  */
-export const createDummyAction = reducer => {
-  return {
-    ...reducer,
-    [dummyAction]: returnState,
-  };
-};
+export const createDummyAction = reducer => ({
+  ...reducer,
+  [dummyAction]: returnState,
+});
 
 
 /**

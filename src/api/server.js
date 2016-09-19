@@ -3,16 +3,14 @@ import path from 'path';
 import Q from 'q';
 import colors from 'colors';
 
-import { logger, log } from '../lib/logger';
 import * as logs from './logs';
 
 
 /**
- * Get the logger string of the child process, hack it and just log it to not
- * have a duplicate logger.info prefix.
+ * Log the child output.
  */
 const childLogger = str => {
-  log(str.trim().replace(/server/, colors.magenta('child')));
+  console.info(str.trim().replace(/server/, colors.magenta('child')));
 };
 
 
@@ -28,7 +26,7 @@ export const start = args => {
   const defaultArgs = {
     port: 3000,
   };
-  const finalArgs = {...defaultArgs, ...args};
+  const finalArgs = { ...defaultArgs, ...args };
 
   const pathToFile = path.join(__dirname, '..', 'server', 'index.js');
   const commandArgs = [
@@ -39,7 +37,7 @@ export const start = args => {
     silent: true,
   };
 
-  logger.info('Starting server with args: ', commandArgs.join(' '));
+  console.info('Starting server with args: ', commandArgs.join(' '));
 
   child = childProcess.fork(pathToFile, commandArgs, options);
 
@@ -54,7 +52,8 @@ export const start = args => {
       // reset activity logs when the server is starting
       logs.reset();
 
-      return deferred.resolve(str);
+      deferred.resolve(str);
+      return;
     }
 
     deferred.notify(str);
@@ -78,7 +77,7 @@ export const start = args => {
   child.on('exit', () => {
     child = undefined;
     const str = 'The server has been stopped.';
-    logger.info(str);
+    console.info(str);
     deferred.resolve(str);
   });
 
@@ -93,7 +92,7 @@ export const stop = () => {
 
   if (!child) {
     const str = 'The server is already stopped.';
-    logger.info(str);
+    console.info(str);
     deferred.resolve(str);
   } else {
     child.kill('SIGHUP');

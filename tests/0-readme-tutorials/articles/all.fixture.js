@@ -3,7 +3,7 @@ require('babel-polyfill');
 
 module.exports = {
   default: [
-    require('./articles.fixture').default,
+    require('./articles').default,
     // require('./operations').default,
   ],
 };

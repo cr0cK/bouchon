@@ -10,7 +10,7 @@ import request from 'request';
 
 const expect = chai.expect;
 
-describe('4-responseBody', function() {
+describe('4-responseBody', function () {
   this.timeout(10000);
   this.port = undefined;
   this.dateCreated = String(new Date());
