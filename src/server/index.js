@@ -10,9 +10,11 @@ import morgan from 'morgan';
 import { apiRouter } from '../lib/router';
 import { errorMiddleware } from '../middlewares/express';
 import { colorizeMethod } from '../lib/colorizeMethod';
-import { displayLogs } from '../lib/logger';
+import { initLogger, displayLogs } from '../lib/logger';
 import { cleanup as cleanupHotReload } from '../lib/hotReload';
 
+
+initLogger();
 
 // prevents the program from closing instantly (doing some cleanup when exiting)
 process.stdin.resume();
