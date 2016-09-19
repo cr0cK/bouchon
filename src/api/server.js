@@ -3,7 +3,6 @@ import path from 'path';
 import Q from 'q';
 import colors from 'colors';
 
-import { logger } from '../lib/logger';
 import * as logs from './logs';
 
 
@@ -11,7 +10,7 @@ import * as logs from './logs';
  * Log the child output.
  */
 const childLogger = str => {
-  logger.info(str.trim().replace(/server/, colors.magenta('child')));
+  console.info(str.trim().replace(/server/, colors.magenta('child')));
 };
 
 
@@ -38,7 +37,7 @@ export const start = args => {
     silent: true,
   };
 
-  logger.info('Starting server with args: ', commandArgs.join(' '));
+  console.info('Starting server with args: ', commandArgs.join(' '));
 
   child = childProcess.fork(pathToFile, commandArgs, options);
 
@@ -78,7 +77,7 @@ export const start = args => {
   child.on('exit', () => {
     child = undefined;
     const str = 'The server has been stopped.';
-    logger.info(str);
+    console.info(str);
     deferred.resolve(str);
   });
 
@@ -93,7 +92,7 @@ export const stop = () => {
 
   if (!child) {
     const str = 'The server is already stopped.';
-    logger.info(str);
+    console.info(str);
     deferred.resolve(str);
   } else {
     child.kill('SIGHUP');

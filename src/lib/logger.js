@@ -15,6 +15,7 @@ export const logger = bunyan.createLogger({
 });
 
 // use the logger for console output too
+logger.console = console.log;
 console.log = logger.info.bind(logger);
 console.info = logger.info.bind(logger);
 console.debug = logger.debug.bind(logger);
@@ -22,7 +23,7 @@ console.error = logger.error.bind(logger);
 console.warn = logger.warn.bind(logger);
 
 /**
- * Flush logs and display them via logger.
+ * Flush logs and display them via console.
  */
 export const displayLogs = logs => {
   if (logs === undefined) {
@@ -37,7 +38,7 @@ export const displayLogs = logs => {
 
   if (_.isArray(logs)) {
     while (logs.length) {
-      logger.info(` => ${logs.pop()}`);
+      console.info(` => ${logs.pop()}`);
     }
   }
 };

@@ -13,7 +13,7 @@ import { outputLogger, activitiesLogger, hotReload } from '../middlewares/redux'
 import { readState as readHotReloadState } from './hotReload';
 import { concatEndpoint } from './combineFixturesRoutes';
 import { combineFixturesReducers } from './combineFixturesReducers';
-import { logger, displayLogs } from './logger';
+import { displayLogs } from './logger';
 
 
 const router = express.Router();
@@ -110,7 +110,7 @@ const loadFixtures = fixturesFiles => {
 
       fixtureContent.forEach(fixtureContent_ => {
         if (!fixtureContent_.name) {
-          logger.error(`
+          console.error(`
 Add a 'name' key in the specs of the fixture localised at ${fixturePath}.
 It will be used to save fixture data in the store.
           `);
@@ -120,7 +120,7 @@ It will be used to save fixture data in the store.
         acc.push(fixtureContent_);
       });
     } catch (err) {
-      logger.error(`
+      console.error(`
 Can't require the fixture from the path "${fixturePath}"
 Cause: ${String(err)}
       `);
@@ -207,7 +207,7 @@ const extractActionParams = (action_, url) => {
     if (_.isArray(actions)) {
       actions.forEach((action, i) => {
         if (!_.isFunction(action)) {
-          logger.error(`A action declared in the route "${url}" is not callable.`);
+          console.error(`A action declared in the route "${url}" is not callable.`);
           actions[i] = dummyAction;
         }
       });
@@ -245,7 +245,7 @@ export const apiRouter = (options) => {
   const rootReducer = combineFixturesReducers(fixturesContent);
 
   // init store
-  logger.info('Initializing store...');
+  console.info('Initializing store...');
 
   const reduxMiddlewares = [thunk, outputLogger, activitiesLogger];
   if (options.hot) {
@@ -260,7 +260,7 @@ export const apiRouter = (options) => {
   let store;
   hotReloadPromise.then((initialState) => {
     if (!_.isEmpty(initialState)) {
-      logger.info('✔ Hot-reloading from the latest known state.');
+      console.info('✔ Hot-reloading from the latest known state.');
     }
 
     store = createStore(
@@ -269,8 +269,8 @@ export const apiRouter = (options) => {
       applyMiddleware(...reduxMiddlewares),
     );
 
-    logger.info('✔ Store is ready.');
-  }).catch((err) => logger.error(err));
+    console.info('✔ Store is ready.');
+  }).catch((err) => console.error(err));
 
   // register routes in the router
   _.forEach(allRoutes, (fixture, routeKey) => {
@@ -285,15 +285,15 @@ export const apiRouter = (options) => {
     } = fixture;
 
     if (!method) {
-      logger.warn(`Verb "${verb}" is invalid! Skipping...`);
+      console.warn(`Verb "${verb}" is invalid! Skipping...`);
       return;
     }
 
-    logger.info(`Registering "${verb} ${url}"`);
+    console.info(`Registering "${verb} ${url}"`);
 
     router[method.toLowerCase()](url, (req, res, next) => {
       if (!store) {
-        logger.error('Store is not ready, wait a second and try again...');
+        console.error('Store is not ready, wait a second and try again...');
         next();
         return;
       }
@@ -339,7 +339,7 @@ export const apiRouter = (options) => {
 
       // get delay
       if (delay) {
-        logger.warn(
+        console.warn(
 `The \`delay\` key is deprecated. Use this notation instead:
 action: {action: myaction, delay: 1000}`);
       }

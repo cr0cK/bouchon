@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 
-import { logger } from './logger';
-
 
 /**
  * Return the path of the hot reload file.
@@ -21,7 +19,7 @@ export const saveState = state => {
 
   fs.writeFile(hotReloadFile, fileContent, (err) => {
     if (err) {
-      logger.error(err);
+      console.error(err);
       return;
     }
   });
@@ -42,7 +40,7 @@ export const readState = () => {
 
     fs.readFile(hotReloadFile, 'utf8', (err, data) => {
       if (err) {
-        logger.warn(`Can't read the hot-reload file (${hotReloadFile}). Error: ${String(err)}`);
+        console.warn(`Can't read the hot-reload file (${hotReloadFile}). Error: ${String(err)}`);
         resolve({});
         return;
       }
@@ -54,7 +52,7 @@ export const readState = () => {
       } catch (parseErr) {
         fs.truncate(hotReloadFile, 0, (truncateErr) => {
           if (err) {
-            logger.error(
+            console.error(
               `Can't write the hot-reload file (${hotReloadFile}). `
               `Error: ${String(truncateErr)}`
             );
@@ -62,7 +60,7 @@ export const readState = () => {
           }
         });
 
-        logger.warn('The hot-reload file has invalid JSON data. Its content has been removed.');
+        console.warn('The hot-reload file has invalid JSON data. Its content has been removed.');
         resolve({});
       }
     });

@@ -10,7 +10,7 @@ import morgan from 'morgan';
 import { apiRouter } from '../lib/router';
 import { errorMiddleware } from '../middlewares/express';
 import { colorizeMethod } from '../lib/colorizeMethod';
-import { logger, displayLogs } from '../lib/logger';
+import { displayLogs } from '../lib/logger';
 import { cleanup as cleanupHotReload } from '../lib/hotReload';
 
 
@@ -32,7 +32,7 @@ try {
   const fixturesPath = path.resolve(commander.path);
   fs.accessSync(fixturesPath, fs.R_OK);
 } catch (err) {
-  logger.error(String(err));
+  console.error(String(err));
   process.exit(1);
 }
 
@@ -47,7 +47,7 @@ app.use(bodyParser.json());
 // setup morgan logger
 app.use(morgan('dev', {
   stream: {
-    write: str => logger.info(` => Response: ${str.trim()}`),
+    write: str => console.info(` => Response: ${str.trim()}`),
   },
 }));
 
@@ -56,7 +56,7 @@ app.use('/', apiRouter(commander));
 
 // display some stuff for each request
 app.use((req, res, next) => {
-  logger.info(`${colorizeMethod(req.method)} ${req.originalUrl}`);
+  console.info(`${colorizeMethod(req.method)} ${req.originalUrl}`);
   displayLogs(req.reduxLogs);
   next();
 });
@@ -64,12 +64,12 @@ app.use((req, res, next) => {
 app.use(errorMiddleware);
 
 if (commander.hot) {
-  logger.info('✔ Hot-reload is enabled.');
+  console.info('✔ Hot-reload is enabled.');
 }
 
 const port = Number(commander.port) || 3000;
 app.listen(port, () => {
-  logger.info(`✔ App listening at port ${port}.`);
+  console.info(`✔ App listening at port ${port}.`);
 });
 
 // cleanup handler
