@@ -33,6 +33,7 @@ export const saveState = state => {
  */
 export const readState = () => {
   const hotReloadFile = getFilePath();
+
   return new Promise((resolve) => {
     if (!fs.existsSync(hotReloadFile)) {
       resolve({});
@@ -66,4 +67,17 @@ export const readState = () => {
       }
     });
   });
+};
+
+/**
+ * Remove the file. Called when the process is exiting.
+ */
+export const cleanup = () => {
+  const hotReloadFile = getFilePath();
+
+  try {
+    fs.unlinkSync(hotReloadFile);
+  } catch (err) {
+    // do nothing specific here...
+  }
 };

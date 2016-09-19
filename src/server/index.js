@@ -11,7 +11,11 @@ import { apiRouter } from '../lib/router';
 import { errorMiddleware } from '../middlewares/express';
 import { colorizeMethod } from '../lib/colorizeMethod';
 import { logger, displayLogs } from '../lib/logger';
+import { cleanup as cleanupHotReload } from '../lib/hotReload';
 
+
+// prevents the program from closing instantly (doing some cleanup when exiting)
+process.stdin.resume();
 
 commander
   .option('-d, --path [path/to/fixtures]', 'Path to the fixtures')
@@ -66,4 +70,20 @@ if (commander.hot) {
 const port = Number(commander.port) || 3000;
 app.listen(port, () => {
   logger.info(`✔ App listening at port ${port}.`);
+});
+
+// cleanup handler
+process.on('cleanup', () => {
+  cleanupHotReload();
+});
+
+// do stuff when exiting.
+process.on('exit', () => {
+  process.emit('cleanup');
+  process.exit(0);
+});
+
+// catch ctrl+c
+process.on('SIGINT', () => {
+  process.exit(0);
 });
