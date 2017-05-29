@@ -291,7 +291,7 @@ module.exports = {
 };
 ```
 
-> Note: Don't forget to create your `.babelrc` file. See the [Babel section](#use-babel-for-your-fixtures) for more informations.
+> Note: Don't forget to create your `.babelrc` file. See the [Babel section](#use-babel-for-your-fixtures) for more informations.
 
 You can now start bouchon by providing your fixture folder and an optional port:
 
@@ -348,7 +348,7 @@ Hey, it works!
 
 Now that you have an idea of how bouchon works, let's continue with complex workflows.
 
-### Export actions
+### Export actions
 
 You should split your data and fixture by API namespace.
 For example, if you have `./api/articles` and `./api/operations`, make two fixtures
@@ -357,7 +357,7 @@ that each handles their data.
 But if you need to alter the state of an another fixture, you can export your
 actions and reuse them in any fixture.
 
-### Export selectors
+### Export selectors
 
 In the same way, you can export selectors.
 
@@ -410,7 +410,7 @@ export default {
 };
 ```
 
-### Multiple actions
+### Multiple actions
 
 Because your data is splitted into several fixtures, you may need to alter the state
 of several parts of your state for a single request.
