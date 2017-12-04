@@ -1,8 +1,17 @@
-export { createSelector } from 'reselect';
-export { createAction, createReducer } from 'redux-act';
-export { combineReducers } from 'redux';
-export SchemaObject from 'node-schema-object';
+// @flow
 
-export { api } from './api';
-export { combineFixtures, combineFixturesRoutes, combineFixturesReducers }
-  from './lib';
+export { createSelector } from 'reselect';
+export { combineReducers } from 'redux';
+
+export {
+  createAction,
+  createReducer,
+} from './router/redux/redux-act-wrappers';
+
+export {
+  combineFixturesReducers,
+  combineFixturesRoutes,
+  combineFixtures,
+} from './router/combine';
+
+export { router } from './router';

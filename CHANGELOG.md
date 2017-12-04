@@ -26,7 +26,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   - Update dependencies versions.
 
 ## [0.3.1] - 2016-02-01
-
 ### Added
   - Add the support of meta data provided by [reduct-act](https://github.com/pauldijou/redux-act).
 
