@@ -70,12 +70,14 @@ export type RouteMiddleware = {
   }
 };
 
+export type StatusHandler = (selectedData: any) => number | number
+
 export type Route = {
   action: RouteAction,
   backendAction?: RouteBackendAction,
   selector?: (fullState: Object, props: Object) => any,
   middlewares?: Array<RouteMiddleware>,
-  status: Function | number,
+  status: StatusHandler,
 };
 
 export type Routes = {

@@ -18,6 +18,7 @@ import type {
   RouteActionParams,
   Fixture,
   ExtendedRoute,
+  StatusHandler,
   RouteBackendAction,
   RouteMiddleware,
   Action,
@@ -138,7 +139,7 @@ export function loadRootFixture(options: RouterOptions): Fixture {
  * Create if needed a reducer from the fixture reducer definition,
  * and wrap it into the fixture name.
  */
-export function createRootReducer(fixture: Fixture): Function {
+export function createRootReducer(fixture: Fixture): Object {
   const reducerFunction = !isFunction(fixture.reducer) ?
     // if the reducer is just an objet definition (= when it's not a already combined one),
     // create a reducer with its initial data (= state).
@@ -224,7 +225,7 @@ type ProcessActionsArgs = {
   selector?: Function,
   verb: string,
   url: string,
-  status?: Function | number,
+  status?: StatusHandler,
   delay?: number,
   backendAction?: RouteBackendAction,
 };
@@ -274,7 +275,7 @@ export function processActions(args: ProcessActionsArgs): Promise<ProcessActions
 
   const state = store.getState();
 
-  // send the action payload as selectors props
+  // send the action payload as selector props
   const selectedData = selector(state, payload);
 
   if (isFunction(selectedData)) {
@@ -291,8 +292,8 @@ export function processActions(args: ProcessActionsArgs): Promise<ProcessActions
   }
 
   // get statusCode of the response
-  const statusCode = isFunction(status) ?
-    status(selectedData) : status;
+  const statusCode = typeof status === 'function' ?
+    status(selectedData) : status || 200;
 
   // resolve a promise with selected data after delay
   return new Promise((resolve) => {
