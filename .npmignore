@@ -1,8 +1,1 @@
-docs/
-temp/
 src/
-tests/
-**/*.spec.js
-*.tgz
-.eslintrc
-.babelrc
