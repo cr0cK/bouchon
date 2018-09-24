@@ -27,10 +27,15 @@ export const outputLogger = () => (next: Function) => (action: DispatchedAction)
   const actionType =
     action.type.replace(/\[\d+\]/, '').trim() || 'No description provided';
 
+  // remove req from the payload to avoid circular structure error when
+  // stringyfiing the payload
+  const payloadCopy = Object.assign({}, action.payload);
+  delete payloadCopy.req;
+
   const logs = [
     `${colorizeMethod(req.method)} ${req.originalUrl}`,
     `${colors.cyan('Action:')} ${colors.white(actionType)}`,
-    `${colors.cyan('Payload:')} ${colors.white(JSON.stringify(action.payload))}`,
+    `${colors.cyan('Payload:')} ${colors.white(JSON.stringify(payloadCopy))}`,
   ];
 
   if (backendAction) {
