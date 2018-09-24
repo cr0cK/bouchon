@@ -247,10 +247,11 @@ export function processActions(args: ProcessActionsArgs): Promise<ProcessActions
     ...req.params,
     ...req.body,
     ...req.headers,
-    query: { ...req.query },
-    params: { ...req.params },
-    body: { ...req.body },
-    headers: { ...req.headers },
+    query: req.query,
+    params: req.params,
+    body: req.body,
+    headers: req.headers,
+    req,
   };
 
   // dispatch actions
