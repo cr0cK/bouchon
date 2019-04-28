@@ -5,6 +5,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.0.0-alpha.4] - 2019-04-29
+### Added
+  - Add store in action meta. Allow to retrieve the store in reducers.
+
+## [2.0.0-alpha.3]
+
+## [2.0.0-alpha.2]
+
+## [2.0.0-alpha.1]
+
 ## [0.4.0] - 2016-09-19
 ### Added
   - Hot reload feature (see README for more informations).
