@@ -261,6 +261,7 @@ export function processActions(args: ProcessActionsArgs): Promise<ProcessActions
     const meta = {
       req,
       res,
+      store,
       backendAction,
       isBouchonAction: true,
     };
